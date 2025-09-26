@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
@@ -10,12 +11,12 @@ public class PlayerController : MonoBehaviour
     public LayerMask whatIsGround;
     public Vector2 groundBoxSize = new Vector2(0.8f,0.2f);
     
-    private InputManager _input;
+    private InputManager2 _input;
     private Rigidbody2D _rigidbody2D;
 
     private void Start()
     {
-        _input = GetComponent<InputManager>();
+        _input = GetComponent<InputManager2>();
         _rigidbody2D = GetComponent<Rigidbody2D>();
     }
 
