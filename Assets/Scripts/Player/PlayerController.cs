@@ -12,7 +12,10 @@ public class PlayerController : MonoBehaviour
     public LayerMask whatIsGround;
     public Transform groundCheck;
     public bool playerIsGrounded;
+    public GameObject bullet;
+    public Transform bulletSpawn;
     private InputManager2 _input;
+    
     
 
     private Rigidbody2D _rigidbody2D;
