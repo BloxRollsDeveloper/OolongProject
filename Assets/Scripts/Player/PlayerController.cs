@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
@@ -11,6 +12,7 @@ public class PlayerController : MonoBehaviour
     public LayerMask whatIsGround;
     public Transform groundCheck;
     public bool playerIsGrounded;
+    private InputManager2 _input;
     
 
     private Rigidbody2D _rigidbody2D;
@@ -23,6 +25,7 @@ public class PlayerController : MonoBehaviour
         _rigidbody2D = GetComponent<Rigidbody2D>();
         _animator = GetComponent<Animator>();
         _sprite = GetComponent<SpriteRenderer>();
+        _input = GetComponent<InputManager2>();
     }
 
     void Update()
@@ -52,7 +55,7 @@ public class PlayerController : MonoBehaviour
             playerIsGrounded = false;
         }
         
-        if (Input.Jump && playerIsGrounded)
+        if (_input.Jump && playerIsGrounded)
         {
             _rigidbody2D.linearVelocityY = jumpForce;
         }
