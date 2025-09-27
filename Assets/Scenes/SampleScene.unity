@@ -127,6 +127,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: -5065561999109359643, guid: 9ff2999e95505b64b9633b642939618b, type: 3}
+      propertyPath: playerIsGrounded
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -5065561999109359643, guid: 9ff2999e95505b64b9633b642939618b, type: 3}
+      propertyPath: whatIsGround.m_Bits
+      value: 8
+      objectReference: {fileID: 0}
     - target: {fileID: -3231906521020303126, guid: 9ff2999e95505b64b9633b642939618b, type: 3}
       propertyPath: m_GravityScale
       value: 1
@@ -134,6 +142,10 @@ PrefabInstance:
     - target: {fileID: 4566519416414091231, guid: 9ff2999e95505b64b9633b642939618b, type: 3}
       propertyPath: m_Name
       value: Player
+      objectReference: {fileID: 0}
+    - target: {fileID: 4566519416414091231, guid: 9ff2999e95505b64b9633b642939618b, type: 3}
+      propertyPath: m_Layer
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 8158521800237086204, guid: 9ff2999e95505b64b9633b642939618b, type: 3}
       propertyPath: m_LocalPosition.x
