@@ -62,6 +62,11 @@ public class PlayerController : MonoBehaviour
         {
             _rigidbody2D.linearVelocityY = jumpForce;
         }
+
+        if (_input.Attack)
+        {
+            Instantiate(bullet, bulletSpawn.position, Quaternion.identity); 
+        }
     }
 
     void FixedUpdate()
