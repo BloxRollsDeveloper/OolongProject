@@ -1,5 +1,6 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(Animator))]
@@ -16,12 +17,18 @@ public class PlayerController : MonoBehaviour
     public Transform bulletSpawn;
     private InputManager2 _input;
     
-    
+    //TODO: COMMENT YOUR CODE
+    //TODO FOR REAL: add variable jump height
 
     private Rigidbody2D _rigidbody2D;
     private Animator _animator;
     private SpriteRenderer _sprite;
     private float horizontalInput;
+
+
+    public float gravCuttoff; //the value the players velocity needs to reach to trigger
+    public float gravStrength; //the strength of gravity on falling from a jump
+    public float terminalVelocity; //max downward velocity player can travel at
 
     void Awake()
     {
@@ -33,7 +40,10 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-       
+        if(_rigidbody2D.linearVelocity.y < terminalVelocity) _rigidbody2D.linearVelocityY = terminalVelocity; //terminal velocity code, if players Y is lower than this value, sets it to terminal velocity 
+        if (_rigidbody2D.linearVelocityY < gravCuttoff) _rigidbody2D.gravityScale = gravStrength;   //jump cutoff, increase gravity when player reaches peak of their jump
+       else _rigidbody2D.gravityScale = 1;  //resets gravity back to 1 if players Y velocity is greater than the cutoff value
+        
         horizontalInput = Input.GetAxisRaw("Horizontal");
 
         
@@ -85,6 +95,6 @@ public class PlayerController : MonoBehaviour
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;
-        Gizmos.DrawWireCube(transform.position, groundBoxSize);
+        Gizmos.DrawWireCube(groundCheck.position, groundBoxSize);
     }
 }
