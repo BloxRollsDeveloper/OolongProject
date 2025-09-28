@@ -63,7 +63,7 @@ public class PlayerController : MonoBehaviour
             _rigidbody2D.linearVelocityY = jumpForce;
         }
 
-        if (_input.Attack)
+        if (_input.Attack || _input.AttackHeld)
         {
             Instantiate(bullet, bulletSpawn.position, Quaternion.identity); 
         }

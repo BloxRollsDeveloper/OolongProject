@@ -6,7 +6,7 @@ public class InputManager2: MonoBehaviour
 
     public float Horizontal;
     public bool Jump;
-    public bool Attack;
+    public bool Attack, AttackHeld;
 
 
     private void Update()
@@ -14,6 +14,7 @@ public class InputManager2: MonoBehaviour
         Horizontal = _inputSystem.Player.Move.ReadValue<Vector2>().x;
         Jump = _inputSystem.Player.Jump.WasPressedThisFrame();
         Attack = _inputSystem.Player.Interact.WasPressedThisFrame();
+        AttackHeld = _inputSystem.Player.Interact.IsPressed();
     }
 
     private void Awake() { _inputSystem = new InputSystem_Actions(); }
