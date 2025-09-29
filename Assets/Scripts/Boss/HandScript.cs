@@ -28,13 +28,9 @@ public class HandScript : MonoBehaviour
     public int attackChainLocal;
     public int attackChainGlobal;
 
-    [Header("Boss tests")] 
-    public bool attackSlamRandom;
-    public bool attackSlamPlayer;
-    public bool attackSweep;
-    
     
     //sine wave math
+    [Header("Animation")]
     private float _sinCenterY;
     [SerializeField] float _sinTimer;
     public float amplitude;
@@ -45,7 +41,22 @@ public class HandScript : MonoBehaviour
 
     private float speedie = 0.2f;
     public bool easeIn;
-    
+
+    [Header("Boss tests")] 
+    public bool attackSlamRandom;
+    public bool attackSlamPlayer;
+    public bool attackSweep;
+    //public bool PlatformDestruction 
+
+    public bool projectileRain;
+    public bool projectilePitch;
+    public bool projectileBasketball;
+    public bool projectileBomb;
+
+    public bool laserHorizontal;
+    public bool laserHorizontalRandom;
+    public bool laserVertical;
+    public bool laserVerticalRandom;
     
     private void Start()
     {
@@ -87,11 +98,11 @@ public class HandScript : MonoBehaviour
         }
         
         //TODO: TEST SUITE
-        
         if (attackSweep) StartCoroutine(AttackHandSweep());
         if (attackSlamRandom) StartCoroutine(AttackHandSlamPos());
         if (attackSlamPlayer) StartCoroutine(AttackHandSlamFollow());
-        
+        if (projectileRain) StartCoroutine(AttackProjectileRain());
+
     }
 
     
@@ -183,5 +194,17 @@ public class HandScript : MonoBehaviour
         TargetPos = new Vector2(transform.position.x, transform.position.y+3); //fist raise position
         yield return new WaitForSeconds(bossHead.telegraphTime/2);
         StartCoroutine(ResetPosition());
+    }
+
+    public IEnumerator AttackProjectileRain()
+    {
+        if (attacking)  yield break;
+        projectileRain = false;
+        attacking = true;
+        transform.rotation = Quaternion.Euler(0,0,90);
+        yield return new WaitForSeconds(1);
+        transform.rotation = Quaternion.Euler(0,0,0);
+        yield return new WaitForSeconds(1);
+        attacking = false;
     }
 }
