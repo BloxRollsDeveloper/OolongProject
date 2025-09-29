@@ -24,7 +24,8 @@ public class PlayerController : MonoBehaviour
     //TODO FOR REAL: add variable jump height
 
     private Rigidbody2D _rigidbody2D;
-    private Animator _animator;
+    private Animator _anim;
+    public Transform graphics;
     private SpriteRenderer _sprite;
     private float horizontalInput;
 
@@ -32,6 +33,7 @@ public class PlayerController : MonoBehaviour
     public float gravCuttoff; //the value the players velocity needs to reach to trigger
     public float gravStrength; //the strength of gravity on falling from a jump
     public float terminalVelocity; //max downward velocity player can travel at
+    private Animator _animator;
 
     void Awake()
     {
@@ -94,9 +96,8 @@ public class PlayerController : MonoBehaviour
 
     private void UpdateAnimation()
     {
-        _animator.SetBool("IsGrounded", playerIsGrounded);
-        _animator.SetFloat("Speed", Mathf.Abs(horizontalInput));
-        _animator.SetFloat("VerticalVelocity", _rigidbody2D.linearVelocity.y);
+        _animator.SetFloat("speed", Mathf.Abs(horizontalInput));
+        _animator.SetFloat("verticalVelocity", _rigidbody2D.linearVelocity.y);
     }
     
     private void OnDrawGizmosSelected()
