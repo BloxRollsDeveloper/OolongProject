@@ -9,6 +9,9 @@ public class PlayerController : MonoBehaviour
     [Header("Movement Settings")]
     public float moveSpeed = 5f;
     public float jumpForce = 10f;
+    public float coolDown;
+    private float cooldownTimer;
+    
     public Vector2 groundBoxSize = new Vector2(0.8f, 0.2f);
     public LayerMask whatIsGround;
     public Transform groundCheck;
@@ -40,6 +43,17 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        if (cooldownTimer >= coolDown)
+        {
+            cooldownTimer -=  Time.deltaTime;
+        }
+        bool firePressed = Input.GetButtonDown("Interact") || Input.GetKeyDown(KeyCode.Space);
+
+        if (firePressed && cooldownTimer <= 0f)
+        {
+            Attack();
+            cooldownTimer = coolDown; 
+        }
         if(_rigidbody2D.linearVelocity.y < terminalVelocity) _rigidbody2D.linearVelocityY = terminalVelocity; //terminal velocity code, if players Y is lower than this value, sets it to terminal velocity 
         if (_rigidbody2D.linearVelocityY < gravCuttoff) _rigidbody2D.gravityScale = gravStrength;   //jump cutoff, increase gravity when player reaches peak of their jump
        else _rigidbody2D.gravityScale = 1;  //resets gravity back to 1 if players Y velocity is greater than the cutoff value
