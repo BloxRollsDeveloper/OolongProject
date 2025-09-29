@@ -111,4 +111,8 @@ public class PlayerController : MonoBehaviour
         Gizmos.color = Color.red;
         Gizmos.DrawWireCube(groundCheck.position, groundBoxSize);
     }
+    private void Attack()
+    {
+        Instantiate(bullet, bulletSpawn.position, Quaternion.identity);
+    }
 }
