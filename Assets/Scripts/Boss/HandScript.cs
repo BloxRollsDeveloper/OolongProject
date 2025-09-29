@@ -1,7 +1,10 @@
 using System;
 using System.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.Serialization;
+using Random = UnityEngine.Random;
 
 public class HandScript : MonoBehaviour
 {
@@ -18,8 +21,12 @@ public class HandScript : MonoBehaviour
     
     
     public bool attacking;
+    public bool followPlayer;
 
     private float telegraphTimer;
+
+    public int attackChainLocal;
+    public int attackChainGlobal;
 
     [Header("Boss tests")] 
     public bool attackSlamRandom;
@@ -32,6 +39,12 @@ public class HandScript : MonoBehaviour
     [SerializeField] float _sinTimer;
     public float amplitude;
     public float frequency;
+    
+    public AnimationCurve curve;
+    private Vector2 zero = Vector2.zero;
+
+    private float speedie = 0.2f;
+    public bool easeIn;
     
     
     private void Start()
@@ -50,8 +63,19 @@ public class HandScript : MonoBehaviour
     {
         if (transitionMove) //used for attacking animations to smooth transition between 2 points
         {
-            transform.position = Vector2.Lerp(transform.position, TargetPos, transitionSpeed * Time.deltaTime);
+            if (followPlayer) TargetPos.x = bossHead.PlayerRB.position.x;
+            if (easeIn)
+            {
+                speedie += 100f;
+                transform.position = Vector2.MoveTowards(transform.position, TargetPos, speedie*curve.Evaluate(Time.deltaTime));
+            }
+            else
+            {
+                transform.position = Vector2.Lerp(transform.position, TargetPos, transitionSpeed * Time.deltaTime);
+            }
+           
         }
+       
         
         if (!attacking) //idle hand animation
         {
@@ -61,13 +85,12 @@ public class HandScript : MonoBehaviour
             position.y = _startPos.y + sin; //setting positions y to sine output plus the gameobjects y position
             transform.position = position;
         }
-
         
         //TODO: TEST SUITE
         
         if (attackSweep) StartCoroutine(AttackHandSweep());
-        if (attackSlamRandom) AttackHandSlamPos();
-        if (attackSlamPlayer) AttackHandSlamFollow();
+        if (attackSlamRandom) StartCoroutine(AttackHandSlamPos());
+        if (attackSlamPlayer) StartCoroutine(AttackHandSlamFollow());
         
     }
 
@@ -80,22 +103,69 @@ public class HandScript : MonoBehaviour
         yield return new WaitForSeconds(1f);
         print(TargetPos);
         print(transform.position);
-        transform.position = _startPos; 
+        transform.position = _startPos;
+        _sinTimer = 0;
+        speedie = 0.2f;
         attacking = false;
         transitionMove = false;
     }
 
-    public void AttackHandSlamPos()
+    public IEnumerator AttackHandSlamPos() //attack with a hand slam in random positions
     {
         attackSlamRandom = false;
+        if (attacking)  yield break;
+        if (attackChainLocal < 1) attackChainLocal = 3;
+        if (attackChainLocal > 0) attackChainLocal--;
+        transitionMove = true; attacking = true;
+        
+        
+        TargetPos = new  Vector2(Random.Range(-6,6), 4); //move hand to random position over the stage
+        yield return new WaitForSeconds(bossHead.telegraphTime/2);
+        
+        TargetPos += new Vector2(0,1);  //wind up position
+        yield return new WaitForSeconds(bossHead.telegraphTime/2);
+        
+        TargetPos = new Vector2(transform.position.x, -3.5f); //slam position
+        easeIn = true;
+        yield return new WaitForSeconds(bossHead.telegraphTime);
+        easeIn = false;
+
+        if (attackChainLocal > 0) //chain attacks multiple times if local chain is greater than 0
+        {
+            attacking = false;
+            StartCoroutine(AttackHandSlamPos());
+        }else StartCoroutine(ResetPosition());
+        
     }
 
-    public void AttackHandSlamFollow()
+    public IEnumerator AttackHandSlamFollow() //hand slam attack following player
     {
+        if (attackChainLocal > 0) attackChainLocal--;
         attackSlamPlayer = false;
+        if (attacking)  yield break;
+        transitionMove = true; attacking = true;
+        
+        TargetPos = new  Vector2(bossHead.PlayerRB.transform.position.x, 4); //move hand to top and follow player
+        followPlayer = true;
+        yield return new WaitForSeconds(bossHead.telegraphTime*3);
+        
+        followPlayer = false;
+        TargetPos += new Vector2(0,1);  //wind up position
+        yield return new WaitForSeconds(bossHead.telegraphTime/2);
+        
+        TargetPos = new Vector2(transform.position.x, -3.5f); //slam position
+        easeIn = true;
+        yield return new WaitForSeconds(bossHead.telegraphTime*2);
+        easeIn = false;
+
+        if (attackChainLocal > 0) //chain attacks multiple times if local chain is greater than 0
+        {
+            attacking = false;
+            StartCoroutine(AttackHandSlamFollow());
+        }else StartCoroutine(ResetPosition());
     }
 
-    private IEnumerator AttackHandSweep()   
+    public IEnumerator AttackHandSweep() //hand sweep attack
     {
         attackSweep = false;
         if (attacking)  yield break;
@@ -103,7 +173,7 @@ public class HandScript : MonoBehaviour
         TargetPos = _stageEdge; //move to the stage edge
         yield return new WaitForSeconds(bossHead.telegraphTime);
         
-        TargetPos = _stageEdge + new Vector2(1,0);  //wind up position
+        TargetPos += new Vector2(1,0);  //wind up position
         yield return new WaitForSeconds(bossHead.telegraphTime/2);
         
         TargetPos = _stageEdge * new Vector2(-1,1); //sweep position
