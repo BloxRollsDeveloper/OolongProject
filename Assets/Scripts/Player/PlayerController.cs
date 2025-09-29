@@ -46,8 +46,6 @@ public class PlayerController : MonoBehaviour
         if (cooldownTimer >= coolDown)
         {
             cooldownTimer -=  Time.deltaTime;
-            Attack();
-            cooldownTimer = coolDown; 
         }
         if(_rigidbody2D.linearVelocity.y < terminalVelocity) _rigidbody2D.linearVelocityY = terminalVelocity; //terminal velocity code, if players Y is lower than this value, sets it to terminal velocity 
         if (_rigidbody2D.linearVelocityY < gravCuttoff) _rigidbody2D.gravityScale = gravStrength;   //jump cutoff, increase gravity when player reaches peak of their jump
@@ -106,8 +104,5 @@ public class PlayerController : MonoBehaviour
         Gizmos.color = Color.red;
         Gizmos.DrawWireCube(groundCheck.position, groundBoxSize);
     }
-    private void Attack()
-    {
-        Instantiate(bullet, bulletSpawn.position, Quaternion.identity);
-    }
+    
 }
