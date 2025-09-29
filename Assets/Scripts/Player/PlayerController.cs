@@ -46,11 +46,6 @@ public class PlayerController : MonoBehaviour
         if (cooldownTimer >= coolDown)
         {
             cooldownTimer -=  Time.deltaTime;
-        }
-        bool firePressed = Input.GetButtonDown("Attack") || Input.GetKeyDown(KeyCode.Space);
-
-        if (firePressed && cooldownTimer <= 0f)
-        {
             Attack();
             cooldownTimer = coolDown; 
         }
