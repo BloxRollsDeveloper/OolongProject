@@ -127,6 +127,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: -5065561999109359643, guid: 9ff2999e95505b64b9633b642939618b, type: 3}
+      propertyPath: coolDown
+      value: 0.5
+      objectReference: {fileID: 0}
     - target: {fileID: 3496019647103054525, guid: 9ff2999e95505b64b9633b642939618b, type: 3}
       propertyPath: m_Controller
       value: 
@@ -866,6 +870,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3011195478498164569, guid: d243455085657bf4c936706afb318f39, type: 3}
       propertyPath: m_Name
+      value: Bullet
+      objectReference: {fileID: 0}
+    - target: {fileID: 3011195478498164569, guid: d243455085657bf4c936706afb318f39, type: 3}
+      propertyPath: m_TagString
       value: Bullet
       objectReference: {fileID: 0}
     m_RemovedComponents: []

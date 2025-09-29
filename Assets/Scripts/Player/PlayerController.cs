@@ -45,7 +45,7 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        if (cooldownTimer >= coolDown)
+        if (cooldownTimer >= 0)
         {
             cooldownTimer -=  Time.deltaTime;
         }
@@ -82,8 +82,9 @@ public class PlayerController : MonoBehaviour
             _rigidbody2D.linearVelocityY = jumpForce;
         }
 
-        if (_input.Attack || _input.AttackHeld)
+        if ((_input.Attack || _input.AttackHeld) && cooldownTimer <= 0)
         {
+            cooldownTimer = coolDown;
             Instantiate(bullet, bulletSpawn.position, Quaternion.identity); 
         }
     }
