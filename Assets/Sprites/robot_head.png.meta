@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 1fc5f16911170c34981c339eefa4a2f9
+guid: 5b3aca12af989774f90746f1b6cc4e4d
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 8403215288983880825
-    second: hand_0
+      213: 906621816329512712
+    second: robot_head_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -46,7 +46,7 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 1
+  spriteMode: 2
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
@@ -113,7 +113,29 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: hand_0
+      name: robot_head_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 32
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 807a0fb0db7f49c00800000000000000
+      internalID: 906621816329512712
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: robot_head_1
       rect:
         serializedVersion: 2
         x: 0
@@ -126,10 +148,10 @@ TextureImporter:
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 974040f78c73e9470800000000000000
-      internalID: 8403215288983880825
+      spriteID: 6181b1f7005a68c4e9e8e427cd7f8dcf
+      internalID: 81854436
       vertices: []
       indices: 
       edges: []
@@ -138,7 +160,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 5e97eb03825dee720800000000000000
+    spriteID: 4b931ac9caf7d884fbacb668f9f1caeb
     internalID: 0
     vertices: []
     indices: 
@@ -148,7 +170,8 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      hand_0: 8403215288983880825
+      robot_head_0: 906621816329512712
+      robot_head_1: 81854436
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

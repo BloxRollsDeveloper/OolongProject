@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 1fc5f16911170c34981c339eefa4a2f9
+guid: 03d903aabbf14b241acd91ecb0ff438a
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 8403215288983880825
-    second: hand_0
+      213: 8196206923705642003
+    second: robot_fist_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -113,13 +113,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: hand_0
+      name: robot_fist_0
       rect:
         serializedVersion: 2
-        x: 0
+        x: 1
         y: 0
-        width: 32
-        height: 32
+        width: 29
+        height: 31
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -128,8 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 974040f78c73e9470800000000000000
-      internalID: 8403215288983880825
+      spriteID: 31c621195c6ceb170800000000000000
+      internalID: 8196206923705642003
       vertices: []
       indices: 
       edges: []
@@ -148,7 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      hand_0: 8403215288983880825
+      robot_fist_0: 8196206923705642003
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

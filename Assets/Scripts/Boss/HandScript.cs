@@ -8,12 +8,23 @@ using Random = UnityEngine.Random;
 
 public class HandScript : MonoBehaviour
 {
+    [Header("projectiles")]
+    public GameObject trashBall;
+    public GameObject carProjectile;
+    public RainTestScript rainManager;
+    public GameObject Bomb;
+    
     public Rigidbody2D handRb;
     public Collider2D handCollider;
+    public Collider2D damageCollider;
     public BossHead bossHead;
 
     private Vector2 _startPos;
-    public Vector2 _stageEdge;
+    public Transform stageEdgeTransform;
+    private Vector2 _stageEdge;
+    public Transform TrashPickupTransform;
+    private Vector2 _TrashPickup; 
+    
 
     public bool transitionMove;
     public Vector2 TargetPos;
@@ -60,12 +71,15 @@ public class HandScript : MonoBehaviour
     
     private void Start()
     {
+        trashBall.SetActive(false);
         bossHead = GameObject.FindGameObjectsWithTag("Boss")[0].GetComponent<BossHead>();
         telegraphTimer = bossHead.telegraphTime;
         handCollider = GetComponent<Collider2D>();  
         _startPos = transform.position;
         handRb = GetComponent<Rigidbody2D>();
-        _stageEdge = GameObject.Find("Stage Edge Right").GetComponent<Vector2>();
+        _stageEdge = stageEdgeTransform.position;
+        _TrashPickup = TrashPickupTransform.position;
+        damageCollider = gameObject.GetComponentInChildren<Collider2D>();
     }
     
     
@@ -103,6 +117,18 @@ public class HandScript : MonoBehaviour
         if (attackSlamPlayer) StartCoroutine(AttackHandSlamFollow());
         if (projectileRain) StartCoroutine(AttackProjectileRain());
 
+        if (projectilePitch) StartCoroutine(AttackProjectilePitch());
+
+
+        /*
+         //todo: ALL OF THIS SHIT
+        if (projectileBasketball);
+        if (projectileBomb);
+        if (laserHorizontal);
+        if (laserHorizontalRandom);
+        if (laserVertical);
+        if (laserVerticalRandom);
+        */
     }
 
     
@@ -112,8 +138,6 @@ public class HandScript : MonoBehaviour
         handCollider.enabled = false;
         TargetPos = _startPos;
         yield return new WaitForSeconds(1f);
-        print(TargetPos);
-        print(transform.position);
         transform.position = _startPos;
         _sinTimer = 0;
         speedie = 0.2f;
@@ -198,13 +222,72 @@ public class HandScript : MonoBehaviour
 
     public IEnumerator AttackProjectileRain()
     {
-        if (attacking)  yield break;
         projectileRain = false;
-        attacking = true;
+        if (attacking)  yield break;
+        attacking = true; transitionMove = true;
+        
+        TargetPos = _TrashPickup;   //go to trash pickup point
+        //todo: change sprite to open hand
         transform.rotation = Quaternion.Euler(0,0,90);
-        yield return new WaitForSeconds(1);
+        yield return new WaitForSeconds(bossHead.telegraphTime);
+        
+        //todo: change sprite to closed hand with trash
+        trashBall.SetActive(enabled);
+        yield return new WaitForSeconds(bossHead.telegraphTime/2);
+        
+        TargetPos = _startPos; //go to start point and reset position
         transform.rotation = Quaternion.Euler(0,0,0);
-        yield return new WaitForSeconds(1);
-        attacking = false;
+        yield return new WaitForSeconds(bossHead.telegraphTime/2);
+        
+        TargetPos += new Vector2(0, -0.5f); //wind up position
+        transform.rotation = Quaternion.Euler(0,0,-90);
+        yield return new WaitForSeconds(bossHead.telegraphTime/2);
+        
+        TargetPos += new Vector2(0,5); //throwing position
+        easeIn = true;
+        yield return new WaitForSeconds(bossHead.telegraphTime/4);
+        trashBall.SetActive(false);
+        yield return new WaitForSeconds(bossHead.telegraphTime/4);
+        easeIn = false;
+        rainManager.SpawnRain();    
+        //todo: change sprite to open hand
+        
+        yield return new WaitForSeconds(bossHead.telegraphTime/2);
+        transform.rotation = Quaternion.Euler(0,0,0);
+        StartCoroutine(ResetPosition());
+    }
+
+    public IEnumerator AttackProjectilePitch()
+    {
+        projectilePitch = false;
+        if (attacking)  yield break;
+        attacking = true; transitionMove = true;
+        
+        TargetPos = _TrashPickup;   //go to trash pickup point
+        //todo: change sprite to open hand
+        transform.rotation = Quaternion.Euler(0,0,90);
+        yield return new WaitForSeconds(bossHead.telegraphTime);
+        
+        //todo: change sprite to closed hand with trash
+        trashBall.SetActive(enabled);
+        yield return new WaitForSeconds(bossHead.telegraphTime/2);
+        
+        TargetPos = new Vector2(_startPos.x,Random.Range(-2,4)); //go to random vertical position
+        transform.rotation = Quaternion.Euler(0,0,0);
+        yield return new WaitForSeconds(bossHead.telegraphTime/2);
+        
+        TargetPos += new Vector2(0.5f, 0); //wind up position
+        yield return new WaitForSeconds(bossHead.telegraphTime/2);
+        
+        TargetPos += new Vector2(-2.5f,0); //throwing position
+        yield return new WaitForSeconds(bossHead.telegraphTime/4);
+        trashBall.SetActive(false);
+        yield return new WaitForSeconds(bossHead.telegraphTime/4);
+        //todo: instantiate big projectile
+        //todo: change sprite to open hand
+        
+        yield return new WaitForSeconds(bossHead.telegraphTime/2);
+        StartCoroutine(ResetPosition());
     }
 }
+

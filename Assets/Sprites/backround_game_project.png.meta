@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 1fc5f16911170c34981c339eefa4a2f9
+guid: 9d8eba2467d23a249b362b71f998c036
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 8403215288983880825
-    second: hand_0
+      213: 8475865044949287437
+    second: backround_game_project_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -113,13 +113,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: hand_0
+      name: backround_game_project_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 32
-        height: 32
+        width: 360
+        height: 180
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -128,8 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 974040f78c73e9470800000000000000
-      internalID: 8403215288983880825
+      spriteID: d024a50f95250a570800000000000000
+      internalID: 8475865044949287437
       vertices: []
       indices: 
       edges: []
@@ -148,7 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      hand_0: 8403215288983880825
+      backround_game_project_0: 8475865044949287437
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
