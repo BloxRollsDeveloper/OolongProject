@@ -1,110 +1,100 @@
-using TMPro;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(Animator))]
+[RequireComponent(typeof(SpriteRenderer))]
+[RequireComponent(typeof(InputManager2))]
 public class PlayerController : MonoBehaviour
 {
     [Header("Movement Settings")]
     public float moveSpeed = 5f;
     public float jumpForce = 10f;
-    public float coolDown;
-    private float cooldownTimer;
-    
+
+    [Header("Gravity Tweaks")]
+    public float gravCutoff = -0.1f;
+    public float gravStrength = 3f;
+    public float terminalVelocity = -20f;
+
+    [Header("Ground Check")]
+    public Transform groundCheck;
     public Vector2 groundBoxSize = new Vector2(0.8f, 0.2f);
     public LayerMask whatIsGround;
-    public Transform groundCheck;
-    public bool playerIsGrounded;
+
+    [Header("Shooting")]
     public GameObject bullet;
     public Transform bulletSpawn;
-    private InputManager2 _input;
-    
-    //TODO: COMMENT YOUR CODE
-    //TODO FOR REAL: add variable jump height
+    public float shootCooldown = 0.25f;
 
-    private Rigidbody2D _rigidbody2D;
-    private Animator _anim;
-    public Transform graphics;
-    private SpriteRenderer _sprite;
-    private float horizontalInput;
+    private Rigidbody2D rb;
+    private Animator animator;
+    private SpriteRenderer sprite;
+    private InputManager2 input;
+    private bool playerIsGrounded;
+    private float cooldownTimer;
 
-
-    public float gravCuttoff; //the value the players velocity needs to reach to trigger
-    public float gravStrength; //the strength of gravity on falling from a jump
-    public float terminalVelocity; //max downward velocity player can travel at
-    private Animator _animator;
-
-    void Awake()
+    private void Awake()
     {
-        _rigidbody2D = GetComponent<Rigidbody2D>();
-        _animator = GetComponent<Animator>();
-        _sprite = GetComponent<SpriteRenderer>();
-        _input = GetComponent<InputManager2>();
+        rb       = GetComponent<Rigidbody2D>();
+        animator = GetComponent<Animator>();
+        sprite   = GetComponent<SpriteRenderer>();
+        input    = GetComponent<InputManager2>();
     }
 
-    void Update()
+    private void Update()
     {
-        if (cooldownTimer >= 0)
-        {
-            cooldownTimer -=  Time.deltaTime;
-        }
-        if(_rigidbody2D.linearVelocity.y < terminalVelocity) _rigidbody2D.linearVelocityY = terminalVelocity; //terminal velocity code, if players Y is lower than this value, sets it to terminal velocity 
-        if (_rigidbody2D.linearVelocityY < gravCuttoff) _rigidbody2D.gravityScale = gravStrength;   //jump cutoff, increase gravity when player reaches peak of their jump
-       else _rigidbody2D.gravityScale = 1;  //resets gravity back to 1 if players Y velocity is greater than the cutoff value
-        
-        horizontalInput = Input.GetAxisRaw("Horizontal");
+        if (cooldownTimer > 0f) cooldownTimer -= Time.deltaTime;
 
-        
-        playerIsGrounded = Physics2D.OverlapBox(transform.position, groundBoxSize, 0f, whatIsGround);
-        if (Input.GetButtonDown("Jump") && playerIsGrounded)
-        {
-            _rigidbody2D.linearVelocity = new Vector2(_rigidbody2D.linearVelocity.x, jumpForce);
-        }
+        playerIsGrounded = Physics2D.OverlapBox(
+            groundCheck.position, groundBoxSize, 0f, whatIsGround);
 
-        
-        if (horizontalInput != 0)
-            _sprite.flipX = horizontalInput < 0;
+        HandleMovement();
+        HandleJump();
+        HandleShoot();
+        UpdateAnimator();
+    }
 
-        
-        UpdateAnimation();
-        if (Physics2D.OverlapBox(groundCheck.position, groundBoxSize, 0f, whatIsGround))
+    private void HandleMovement()
+    {
+        float horizontal = input.Horizontal;
+        rb.linearVelocity = new Vector2(horizontal * moveSpeed, rb.linearVelocity.y);
+        if (horizontal != 0) sprite.flipX = horizontal < 0;
+    }
+
+    private void HandleJump()
+    {
+        if (input.Jump && playerIsGrounded)
         {
-            playerIsGrounded = true;
-        }
-        else
-        {
-            playerIsGrounded = false;
-        }
-        
-        if (_input.Jump && playerIsGrounded)
-        {
-            _rigidbody2D.linearVelocityY = jumpForce;
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
+            animator.SetTrigger("jump");
         }
 
-        if ((_input.Attack || _input.AttackHeld) && cooldownTimer <= 0)
+        if (rb.linearVelocity.y < gravCutoff) rb.gravityScale = gravStrength;
+        else rb.gravityScale = 1f;
+
+        if (rb.linearVelocity.y < terminalVelocity)
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, terminalVelocity);
+    }
+
+    private void HandleShoot()
+    {
+        if ((input.Attack || input.AttackHeld) && cooldownTimer <= 0f)
         {
-            cooldownTimer = coolDown;
-            Instantiate(bullet, bulletSpawn.position, Quaternion.identity); 
+            cooldownTimer = shootCooldown;
+            Instantiate(bullet, bulletSpawn.position, Quaternion.identity);
         }
     }
 
-    void FixedUpdate()
+    private void UpdateAnimator()
     {
-        // Horizontal movement
-        _rigidbody2D.linearVelocity = new Vector2(horizontalInput * moveSpeed, _rigidbody2D.linearVelocity.y);
+        animator.SetFloat("yVelocity", rb.linearVelocity.y);
+        animator.SetFloat("speed", Mathf.Abs(rb.linearVelocity.x));
+        // removed grounded bool line
     }
 
-    private void UpdateAnimation()
-    {
-        _animator.SetFloat("speed", Mathf.Abs(horizontalInput));
-        _animator.SetFloat("verticalVelocity", _rigidbody2D.linearVelocity.y);
-    }
-    
     private void OnDrawGizmosSelected()
     {
+        if (groundCheck == null) return;
         Gizmos.color = Color.red;
         Gizmos.DrawWireCube(groundCheck.position, groundBoxSize);
     }
-    
 }

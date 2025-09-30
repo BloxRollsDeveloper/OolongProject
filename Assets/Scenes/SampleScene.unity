@@ -128,9 +128,17 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: -5065561999109359643, guid: 9ff2999e95505b64b9633b642939618b, type: 3}
+      propertyPath: animator
+      value: 
+      objectReference: {fileID: 1039077488}
+    - target: {fileID: -5065561999109359643, guid: 9ff2999e95505b64b9633b642939618b, type: 3}
       propertyPath: coolDown
       value: 0.5
       objectReference: {fileID: 0}
+    - target: {fileID: -5065561999109359643, guid: 9ff2999e95505b64b9633b642939618b, type: 3}
+      propertyPath: graphics
+      value: 
+      objectReference: {fileID: 1039077493}
     - target: {fileID: 3496019647103054525, guid: 9ff2999e95505b64b9633b642939618b, type: 3}
       propertyPath: m_Controller
       value: 
@@ -775,6 +783,16 @@ TilemapCollider2D:
   m_MaximumTileChangeCount: 1000
   m_ExtrusionFactor: 0
   m_UseDelaunayMesh: 0
+--- !u!95 &1039077488 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 3496019647103054525, guid: 9ff2999e95505b64b9633b642939618b, type: 3}
+  m_PrefabInstance: {fileID: 25449390}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &1039077493 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 8158521800237086204, guid: 9ff2999e95505b64b9633b642939618b, type: 3}
+  m_PrefabInstance: {fileID: 25449390}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1111552524
 GameObject:
   m_ObjectHideFlags: 0
