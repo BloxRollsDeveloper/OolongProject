@@ -27,6 +27,9 @@ public class PlayerController : MonoBehaviour
     public Transform bulletSpawn;
     public float shootCooldown = 0.25f;
 
+    [Header("Platform Drop")]
+    public float dropTime = 0.3f;
+
     private Rigidbody2D rb;
     private Animator animator;
     private SpriteRenderer sprite;
@@ -34,12 +37,16 @@ public class PlayerController : MonoBehaviour
     private bool playerIsGrounded;
     private float cooldownTimer;
 
+    private Collider2D playerCollider;
+    private Collider2D currentPlatform;
+
     private void Awake()
     {
         rb       = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
         sprite   = GetComponent<SpriteRenderer>();
         input    = GetComponent<InputManager2>();
+        playerCollider = GetComponent<Collider2D>();
     }
 
     private void Update()
@@ -52,6 +59,7 @@ public class PlayerController : MonoBehaviour
         HandleMovement();
         HandleJump();
         HandleShoot();
+        HandleDropDown(); //
         UpdateAnimator();
     }
 
@@ -61,7 +69,7 @@ public class PlayerController : MonoBehaviour
         rb.linearVelocity = new Vector2(horizontal * moveSpeed, rb.linearVelocity.y);
         if (horizontal != 0) sprite.flipX = horizontal < 0;
     }
-    
+
     private void HandleJump()
     {
         if (input.Jump && playerIsGrounded)
@@ -76,7 +84,6 @@ public class PlayerController : MonoBehaviour
         if (rb.linearVelocity.y < terminalVelocity)
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, terminalVelocity);
     }
-    
 
     private void HandleShoot()
     {
@@ -87,11 +94,50 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    private void HandleDropDown()
+    {
+        if (Keyboard.current.sKey.wasPressedThisFrame)
+        {
+            Collider2D platform = Physics2D.OverlapBox(
+                groundCheck.position, groundBoxSize, 0f, whatIsGround);
+
+            if (platform != null && platform.CompareTag("Platform"))
+            {
+                StartCoroutine(DropDownThroughPlatform(platform));
+            }
+        }
+    }
+
+    private System.Collections.IEnumerator DropDownThroughPlatform(Collider2D platform)
+    {
+        if (playerCollider != null && platform != null)
+        {
+            Physics2D.IgnoreCollision(playerCollider, platform, true);
+            yield return new WaitForSeconds(dropTime);
+            Physics2D.IgnoreCollision(playerCollider, platform, false);
+        }
+    }
+
+
     private void UpdateAnimator()
     {
         animator.SetFloat("yVelocity", rb.linearVelocity.y);
-        animator.SetFloat("speed", Mathf.Abs(rb.linearVelocity.x));
-        // removed grounded bool line
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.collider.CompareTag("Platform"))
+        {
+            currentPlatform = collision.collider;
+        }
+    }
+
+    private void OnCollisionExit2D(Collision2D collision)
+    {
+        if (collision.collider == currentPlatform)
+        {
+            currentPlatform = null;
+        }
     }
 
     private void OnDrawGizmosSelected()

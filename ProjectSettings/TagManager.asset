@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Boss
   - Bullet
+  - Platform
   layers:
   - Default
   - TransparentFX
