@@ -1,4 +1,6 @@
+using System;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(Animator))]
@@ -59,7 +61,7 @@ public class PlayerController : MonoBehaviour
         rb.linearVelocity = new Vector2(horizontal * moveSpeed, rb.linearVelocity.y);
         if (horizontal != 0) sprite.flipX = horizontal < 0;
     }
-
+    
     private void HandleJump()
     {
         if (input.Jump && playerIsGrounded)
@@ -74,6 +76,7 @@ public class PlayerController : MonoBehaviour
         if (rb.linearVelocity.y < terminalVelocity)
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, terminalVelocity);
     }
+    
 
     private void HandleShoot()
     {
