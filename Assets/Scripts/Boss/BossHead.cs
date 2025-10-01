@@ -10,6 +10,8 @@ public class BossHead : MonoBehaviour
     public GameObject BossJaw;
     public float bossHealth;
     public float telegraphTime;
+    public float projectileSpeed;
+    public float projectileDamage; //maybe maybe not
 
     
     //sine wave stuff

@@ -10,25 +10,26 @@ public class HandScript : MonoBehaviour
 {
     [Header("projectiles")]
     public GameObject trashBall;
+    public Transform TrashPickupTransform;
+    private Vector2 _TrashPickup; 
     public GameObject carProjectile;
     public RainTestScript rainManager;
-    public GameObject Bomb;
+    public GameObject bomb;
+    public GameObject laserObject;
+    private Animator _animator;
     
+    [Header("movement")]
+    private Vector2 _stageEdge;
+    private Vector2 _startPos;
     public Rigidbody2D handRb;
     public Collider2D handCollider;
     public Collider2D damageCollider;
     public BossHead bossHead;
-
-    private Vector2 _startPos;
     public Transform stageEdgeTransform;
-    private Vector2 _stageEdge;
-    public Transform TrashPickupTransform;
-    private Vector2 _TrashPickup; 
-    
-
-    public bool transitionMove;
     public Vector2 TargetPos;
+    
     public float transitionSpeed;
+    public bool transitionMove;
     
     
     public bool attacking;
@@ -37,7 +38,6 @@ public class HandScript : MonoBehaviour
     private float telegraphTimer;
 
     public int attackChainLocal;
-    public int attackChainGlobal;
 
     
     //sine wave math
@@ -80,12 +80,14 @@ public class HandScript : MonoBehaviour
         _stageEdge = stageEdgeTransform.position;
         _TrashPickup = TrashPickupTransform.position;
         damageCollider = gameObject.GetComponentInChildren<Collider2D>();
+        _animator = GetComponent<Animator>();
     }
     
     
 
     private void Update()
     {
+        
         if (transitionMove) //used for attacking animations to smooth transition between 2 points
         {
             if (followPlayer) TargetPos.x = bossHead.PlayerRB.position.x;
@@ -116,27 +118,40 @@ public class HandScript : MonoBehaviour
         if (attackSlamRandom) StartCoroutine(AttackHandSlamPos());
         if (attackSlamPlayer) StartCoroutine(AttackHandSlamFollow());
         if (projectileRain) StartCoroutine(AttackProjectileRain());
-
         if (projectilePitch) StartCoroutine(AttackProjectilePitch());
-
-
+        if (projectileBasketball) StartCoroutine(AttackProjectileBasketball());
+        if (laserHorizontalRandom) StartCoroutine(AttackLaserHorizontalRandom());
+        if (laserVerticalRandom) StartCoroutine(AttackLaserVerticalRandom());
         /*
          //todo: ALL OF THIS SHIT
-        if (projectileBasketball);
+
         if (projectileBomb);
-        if (laserHorizontal);
         if (laserHorizontalRandom);
         if (laserVertical);
         if (laserVerticalRandom);
         */
+        UpdateAnimation();
     }
 
+
+    private void UpdateAnimation()
+    {
+        /* todo
+        _animator.Play("boss grab");
+        _animator.Play("boss palm horizontal")
+        _animator.Play("boss palm vertical");
+        _animator.Play("Boss fist");
+        */
+    }
     
+    //ATTACK EVENTS
     
     public IEnumerator ResetPosition()  //resets all variables and positions to standard settings
     {
+        transform.localScale = new Vector2(-1, 1);
         handCollider.enabled = false;
         TargetPos = _startPos;
+        _animator.Play("Boss fist");
         yield return new WaitForSeconds(1f);
         transform.position = _startPos;
         _sinTimer = 0;
@@ -153,7 +168,7 @@ public class HandScript : MonoBehaviour
         if (attackChainLocal > 0) attackChainLocal--;
         transitionMove = true; attacking = true;
         
-        
+        _animator.Play("Boss fist");
         TargetPos = new  Vector2(Random.Range(-6,6), 4); //move hand to random position over the stage
         yield return new WaitForSeconds(bossHead.telegraphTime/2);
         
@@ -180,6 +195,7 @@ public class HandScript : MonoBehaviour
         if (attacking)  yield break;
         transitionMove = true; attacking = true;
         
+        _animator.Play("Boss fist");
         TargetPos = new  Vector2(bossHead.PlayerRB.transform.position.x, 4); //move hand to top and follow player
         followPlayer = true;
         yield return new WaitForSeconds(bossHead.telegraphTime*3);
@@ -208,6 +224,7 @@ public class HandScript : MonoBehaviour
         TargetPos = _stageEdge; //move to the stage edge
         yield return new WaitForSeconds(bossHead.telegraphTime);
         
+        _animator.Play("Boss fist");
         TargetPos += new Vector2(1,0);  //wind up position
         yield return new WaitForSeconds(bossHead.telegraphTime/2);
         
@@ -226,40 +243,91 @@ public class HandScript : MonoBehaviour
         if (attacking)  yield break;
         attacking = true; transitionMove = true;
         
+        _animator.Play("boss palm vertical");
         TargetPos = _TrashPickup;   //go to trash pickup point
-        //todo: change sprite to open hand
-        transform.rotation = Quaternion.Euler(0,0,90);
+        //transform.rotation = Quaternion.Euler(0,0,90);
         yield return new WaitForSeconds(bossHead.telegraphTime);
         
-        //todo: change sprite to closed hand with trash
+        _animator.Play("boss grab");
+        transform.localScale = transform.localScale * new Vector2(-1, 1);
         trashBall.SetActive(enabled);
         yield return new WaitForSeconds(bossHead.telegraphTime/2);
         
         TargetPos = _startPos; //go to start point and reset position
-        transform.rotation = Quaternion.Euler(0,0,0);
+        //transform.rotation = Quaternion.Euler(0,0,0);
         yield return new WaitForSeconds(bossHead.telegraphTime/2);
         
         TargetPos += new Vector2(0, -0.5f); //wind up position
-        transform.rotation = Quaternion.Euler(0,0,-90);
+        transform.rotation = Quaternion.Euler(0,0,180);
         yield return new WaitForSeconds(bossHead.telegraphTime/2);
         
         TargetPos += new Vector2(0,5); //throwing position
         easeIn = true;
         yield return new WaitForSeconds(bossHead.telegraphTime/4);
         trashBall.SetActive(false);
+        _animator.Play("boss palm vertical");
         yield return new WaitForSeconds(bossHead.telegraphTime/4);
         easeIn = false;
         rainManager.SpawnRain();    
-        //todo: change sprite to open hand
+        
         
         yield return new WaitForSeconds(bossHead.telegraphTime/2);
+        transform.localScale = transform.localScale * new Vector2(-1, 1);
         transform.rotation = Quaternion.Euler(0,0,0);
         StartCoroutine(ResetPosition());
     }
 
-    public IEnumerator AttackProjectilePitch()
+    public IEnumerator AttackProjectilePitch() //FUCK THIS ATTACK
     {
         projectilePitch = false;
+        if (attacking)  yield break;
+        attacking = true; transitionMove = true;
+        
+        TargetPos = _TrashPickup;   //go to trash pickup point
+        _animator.Play("boss palm vertical");
+        yield return new WaitForSeconds(bossHead.telegraphTime);
+        
+        _animator.Play("boss grab");
+        
+        var projectileClone = Instantiate(carProjectile, transform.position, transform.rotation);
+        projectileClone.TryGetComponent(out BigProjectileAttack projectileScript);
+        projectileClone.TryGetComponent(out Rigidbody2D rb2D);
+        projectileScript.spawnerObject = gameObject.transform;
+        projectileScript.followSpawner = true;
+        projectileScript.basketball = true;
+        
+        yield return new WaitForSeconds(bossHead.telegraphTime/2);
+        
+        TargetPos = new Vector2(_startPos.x,Random.Range(-2,4)); //go to random vertical position
+        transform.rotation = Quaternion.Euler(0,0,-90);
+        yield return new WaitForSeconds(bossHead.telegraphTime/2);
+        
+        TargetPos += new Vector2(0.5f, 0); //wind up position
+        yield return new WaitForSeconds(bossHead.telegraphTime/2);
+        easeIn = true;
+        TargetPos += new Vector2(-2.5f,0); //throwing position
+        transform.rotation = Quaternion.Euler(0,0,0);
+        transform.localScale = transform.localScale * new Vector2(-1, 1);
+        _animator.Play("boss palm horizontal");
+        yield return new WaitForSeconds(bossHead.telegraphTime/4);
+
+        projectileScript.followSpawner = false; //ball stops following hand
+        projectileClone.transform.localScale = new Vector3(-2,2,2); //point ball left
+        projectileScript.FUCKINGMOVE();
+        rb2D.gravityScale = 1;
+        Destroy(projectileClone, 5);
+        easeIn = false;
+
+
+        
+        yield return new WaitForSeconds(bossHead.telegraphTime/2);
+        transform.localScale = transform.localScale * new Vector2(-1, 1);
+        StartCoroutine(ResetPosition());
+    }
+
+    public IEnumerator AttackProjectileBasketball()
+    {
+        projectileBasketball = false;
         if (attacking)  yield break;
         attacking = true; transitionMove = true;
         
@@ -269,25 +337,108 @@ public class HandScript : MonoBehaviour
         yield return new WaitForSeconds(bossHead.telegraphTime);
         
         //todo: change sprite to closed hand with trash
-        trashBall.SetActive(enabled);
+        
+        var projectileClone = Instantiate(carProjectile, transform.position, transform.rotation);
+        projectileClone.TryGetComponent(out BigProjectileAttack projectileScript);
+        projectileClone.TryGetComponent(out Rigidbody2D rb2D);
+        projectileScript.spawnerObject = gameObject.transform;
+        projectileScript.followSpawner = true;
+        
         yield return new WaitForSeconds(bossHead.telegraphTime/2);
         
-        TargetPos = new Vector2(_startPos.x,Random.Range(-2,4)); //go to random vertical position
-        transform.rotation = Quaternion.Euler(0,0,0);
+        TargetPos = _startPos;
         yield return new WaitForSeconds(bossHead.telegraphTime/2);
         
-        TargetPos += new Vector2(0.5f, 0); //wind up position
+        TargetPos += new Vector2(0, -2f); //wind up position
+        transform.rotation = Quaternion.Euler(0,0,-90);
+        yield return new WaitForSeconds(bossHead.telegraphTime/2);
+        easeIn = true;
+        TargetPos += new Vector2(0,5); //throwing position
         yield return new WaitForSeconds(bossHead.telegraphTime/2);
         
-        TargetPos += new Vector2(-2.5f,0); //throwing position
-        yield return new WaitForSeconds(bossHead.telegraphTime/4);
-        trashBall.SetActive(false);
-        yield return new WaitForSeconds(bossHead.telegraphTime/4);
-        //todo: instantiate big projectile
+        projectileScript.followSpawner = false; //ball stops following hand
+        projectileClone.transform.localScale = new Vector3(-2,2,2); //point ball left
+        projectileScript.FUCKINGMOVE();
+        rb2D.gravityScale = 1;
+        Destroy(projectileClone, 5);
+        easeIn = false;
+        //todo: change sprite to open hand
+        
+        
+        
+        
+        
         //todo: change sprite to open hand
         
         yield return new WaitForSeconds(bossHead.telegraphTime/2);
+        transform.rotation = Quaternion.Euler(0,0,0);
         StartCoroutine(ResetPosition());
+    }
+
+    public IEnumerator AttackLaserHorizontalRandom()
+    {
+        
+        laserHorizontalRandom = false;
+        if (attacking)  yield break;
+        if (attackChainLocal < 1) attackChainLocal = 3;
+        if (attackChainLocal > 0) attackChainLocal--;
+        attacking = true; transitionMove = true;
+        
+        TargetPos = new Vector2(_startPos.x,Random.Range(-2,4)); //go to random vertical position
+        _animator.Play("boss palm horizontal");
+        transform.localScale *= new Vector2(-1, 1);
+        
+        yield return new WaitForSeconds(bossHead.telegraphTime/2);
+        var projectileClone = Instantiate(laserObject, transform.position, transform.rotation);
+        projectileClone.TryGetComponent(out Laser laserScript);
+        laserScript.laserFirePoint.transform.position = new Vector3(transform.position.x*-2,transform.position.y,0);
+        
+        easeIn = true;
+        TargetPos += new Vector2(0.1f, 0); //wind up position
+        yield return new WaitForSeconds(bossHead.telegraphTime/2);
+        easeIn = false;
+        TargetPos -= new Vector2(0.1f, 0);
+        laserScript.stopLaser(); //plays laser stop animation
+        
+        if (attackChainLocal > 0) //chain attacks multiple times if local chain is greater than 0
+        {
+            transform.localScale *= new Vector2(-1, 1);
+            attacking = false;
+            StartCoroutine(AttackLaserHorizontalRandom());
+        }else StartCoroutine(ResetPosition());
+    }
+    
+    public IEnumerator AttackLaserVerticalRandom()
+    {
+        
+        laserVerticalRandom = false;
+        if (attacking)  yield break;
+        if (attackChainLocal < 1) attackChainLocal = 3;
+        if (attackChainLocal > 0) attackChainLocal--;
+        attacking = true; transitionMove = true;
+        
+        TargetPos = new Vector2(Random.Range(-6.5f,6.5f),4); //go to random vertical position
+        _animator.Play("boss palm vertical");
+        transform.localScale *= new Vector2(-1, 1);
+        
+        yield return new WaitForSeconds(bossHead.telegraphTime/2);
+        var projectileClone = Instantiate(laserObject, transform.position, transform.rotation);
+        projectileClone.TryGetComponent(out Laser laserScript);
+        laserScript.laserFirePoint.transform.position = new Vector3(transform.position.x,-4,0); //set laser target position
+        
+        easeIn = true;
+        //TargetPos += new Vector2(0, 0.5f); //wind up position
+        yield return new WaitForSeconds(bossHead.telegraphTime);
+        easeIn = false;
+        //TargetPos -= new Vector2(0, -0.5f);
+        laserScript.stopLaser(); //plays laser stop animation
+        
+        if (attackChainLocal > 0) //chain attacks multiple times if local chain is greater than 0
+        {
+            transform.localScale *= new Vector2(-1, 1);
+            attacking = false;
+            StartCoroutine(AttackLaserVerticalRandom());
+        }else StartCoroutine(ResetPosition());
     }
 }
 
