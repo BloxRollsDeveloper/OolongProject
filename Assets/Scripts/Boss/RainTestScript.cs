@@ -66,6 +66,7 @@ public class RainTestScript : MonoBehaviour
         int randomIndex = Random.Range(0, rain.Length);
         GameObject randomPrefab = rain[randomIndex];
             
-        Instantiate(randomPrefab, transform.position, transform.rotation);
+        var rainClone = Instantiate(randomPrefab, transform.position, transform.rotation);
+        Destroy(rainClone,10);
     }
 }

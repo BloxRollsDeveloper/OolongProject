@@ -3,6 +3,7 @@ using UnityEngine;
 public class SineWaveanim : MonoBehaviour
 {
     //sine wave stuff
+    public BossHead bossHead;
     private float _sinTimer;
     public float frequency;
     public float amplitude;
@@ -12,10 +13,12 @@ public class SineWaveanim : MonoBehaviour
     private void Start()
     {
         _sinTimer = 0.5f;
+        bossHead = GameObject.FindGameObjectWithTag("Boss").GetComponent<BossHead>();
     }
 
     private void Update()
     {
+        if (!bossHead.bossActive) return;
         _sinTimer -= Time.deltaTime; //sine wave timer
         Vector3 position = transform.position;  //local variable: position
         float sin = Mathf.Sin(_sinTimer*frequency) * amplitude; //sine wave math

@@ -65,11 +65,11 @@ public class HandScript : MonoBehaviour
     public bool projectileRain;
     public bool projectilePitch;
     public bool projectileBasketball;
-    public bool projectileBomb;
+    //public bool projectileBomb;
 
-    public bool laserHorizontal;
+    //public bool laserHorizontal;
     public bool laserHorizontalRandom;
-    public bool laserVertical;
+    //public bool laserVertical;
     public bool laserVerticalRandom;
     
     private void Start()
@@ -90,7 +90,8 @@ public class HandScript : MonoBehaviour
 
     private void Update()
     {
-        
+
+        if (!bossHead.bossActive) return;
         if (transitionMove) //used for attacking animations to smooth transition between 2 points
         {
             if (followPlayer) TargetPos.x = bossHead.PlayerRB.position.x;
@@ -125,15 +126,30 @@ public class HandScript : MonoBehaviour
         if (projectileBasketball) StartCoroutine(AttackProjectileBasketball());
         if (laserHorizontalRandom) StartCoroutine(AttackLaserHorizontalRandom());
         if (laserVerticalRandom) StartCoroutine(AttackLaserVerticalRandom());
+        
         /*
          //todo: ALL OF THIS SHIT
-
         if (projectileBomb);
         if (laserHorizontalRandom);
         if (laserVertical);
         if (laserVerticalRandom);
         */
         UpdateAnimation();
+    }
+
+    public void InitiateAttack()
+    {
+        if (attacking) return;
+        bossHead.AttackPool--;
+        var attack = Random.Range(1, 8);
+        if (attack == 1) attackSweep = true;
+        if (attack == 2) attackSlamRandom = true;
+        if (attack == 3) attackSlamPlayer = true;
+        if (attack == 4) projectileRain = true;
+        if (attack == 5)  projectilePitch = true;
+        if (attack == 6) projectileBasketball = true;
+        if (attack == 7) laserHorizontalRandom = true;
+        if (attack == 8) laserVerticalRandom = true;
     }
 
 
@@ -218,7 +234,11 @@ public class HandScript : MonoBehaviour
         {
             attacking = false;
             StartCoroutine(AttackHandSlamFollow());
-        }else StartCoroutine(ResetPosition());
+        }
+        else
+        {
+            StartCoroutine(ResetPosition());
+        }
     }
 
     public IEnumerator AttackHandSweep() //hand sweep attack
@@ -273,7 +293,7 @@ public class HandScript : MonoBehaviour
         _animator.Play("boss palm vertical");
         yield return new WaitForSeconds(bossHead.telegraphTime/4);
         easeIn = false;
-        rainManager.SpawnRain();    
+        rainManager.SpawnRain();
         
         
         yield return new WaitForSeconds(bossHead.telegraphTime/2);
@@ -329,8 +349,6 @@ public class HandScript : MonoBehaviour
         rb2D.gravityScale = 1;
         Destroy(projectileClone, 5);
         easeIn = false;
-
-
         
         yield return new WaitForSeconds(bossHead.telegraphTime/2);
         transform.localScale = transform.localScale * new Vector2(-1, 1);
@@ -416,7 +434,11 @@ public class HandScript : MonoBehaviour
             transform.localScale *= new Vector2(-1, 1);
             attacking = false;
             StartCoroutine(AttackLaserHorizontalRandom());
-        }else StartCoroutine(ResetPosition());
+        }
+        else
+        {
+            StartCoroutine(ResetPosition());
+        }
     }
     
     public IEnumerator AttackLaserVerticalRandom()
@@ -449,7 +471,11 @@ public class HandScript : MonoBehaviour
             transform.localScale *= new Vector2(-1, 1);
             attacking = false;
             StartCoroutine(AttackLaserVerticalRandom());
-        }else StartCoroutine(ResetPosition());
+        }
+        else
+        {
+            StartCoroutine(ResetPosition());
+        }
     }
 }
 
