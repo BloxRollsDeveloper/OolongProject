@@ -8,6 +8,7 @@ public class BossProjectile : MonoBehaviour
     public float BossBulletSpeed;
     [SerializeField] private float rotationTimer;
     private float _rTimer;
+    [SerializeField] private AudioClip[] _impactClip;
     
     
     void Start()
@@ -39,6 +40,11 @@ public class BossProjectile : MonoBehaviour
         {
             //damage player
         }
-        if (other.gameObject.layer == LayerMask.NameToLayer("Ground")) Destroy(gameObject);
+        if (other.gameObject.layer == LayerMask.NameToLayer("Ground"))
+        {
+            SoundFXManager.instance.PlayRandomSoundFXClip(_impactClip, transform, 1f);
+            Destroy(gameObject);
+        }
+        
     }
 }

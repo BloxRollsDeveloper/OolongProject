@@ -3,17 +3,24 @@ using System;
 using System.Collections;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.Serialization;
 
 public class BossHead : MonoBehaviour
 {
 
+    public BossSoundManager bossSoundManager;
     private SpriteRenderer _spriteRenderer;
     public  Rigidbody2D headRB;
     public Rigidbody2D PlayerRB;
     public GameObject BossJaw;
     public SpriteRenderer BossJawSprite;
     public GameObject[] handObject;
+    public Sprite headActive;
+    public Sprite headInactive;
+    public AudioClip bossRoar;
+    public AudioClip bossRoar2;
+    
     public int bossHealth;
     public float telegraphTime;
     public float projectileSpeed;
@@ -22,6 +29,8 @@ public class BossHead : MonoBehaviour
     public float attackCooldown;
     private float _attackTimer;
     public int AttackPool;
+    public float HeadCooldown;
+    private float _headTimer;
 
     private bool _attacking;
     public bool bossActive;
@@ -37,13 +46,43 @@ public class BossHead : MonoBehaviour
 
     private void Start()
     {
+        bossActive = false;
+        bossSoundManager = GetComponent<BossSoundManager>();
         handObject = GameObject.FindGameObjectsWithTag("BossHand");
         _spriteRenderer = GetComponent<SpriteRenderer>();
         _startPos = transform.position;
         headRB = GetComponent<Rigidbody2D>();
         PlayerRB = GameObject.FindGameObjectWithTag("Player").GetComponent<Rigidbody2D>();
+        startingAnimation();
     }
 
+    public void startingAnimation()
+    {
+        _spriteRenderer.sprite = headInactive;
+        BossJaw.gameObject.transform.position = _startPos;
+        Invoke("StartingAnim1", 4);
+    }
+
+    private void StartingAnim1()
+    {
+        _spriteRenderer.sprite = headActive;
+        Invoke ("startingAnim2",2f);
+    }
+
+    private void startingAnim2()
+    {
+        BossJaw.gameObject.transform.position = new Vector2(_startPos.x, _startPos.y-1.5f);
+        transform.position = new Vector2(transform.position.x, transform.position.y+0.5f);
+        SoundFXManager.instance.PlaySoundFXClip(bossRoar,transform,1f);
+        Invoke("StartBoss",3f);
+    }
+    
+    private void StartBoss()
+    {
+        bossActive = true;
+        SoundFXManager.instance.PlayMusic();
+    }
+    
     private void Update()
     {
         if (bossHealth == 150) bossStage = 2;
@@ -51,7 +90,7 @@ public class BossHead : MonoBehaviour
         if (bossHealth <= 0)
         {
             bossActive = false;
-            Death();
+            Invoke("Death",2);
         }
         if (_attackTimer > 0) _attackTimer -= Time.deltaTime;
 
@@ -84,7 +123,16 @@ public class BossHead : MonoBehaviour
 
     public void Death()
     {
+        BossJaw.gameObject.transform.position = new Vector2(_startPos.x, _startPos.y-1.5f);
+        transform.position = new Vector2(transform.position.x, transform.position.y+0.5f);
+        SoundFXManager.instance.PlaySoundFXClip(bossRoar2,transform,1f);
         print("IM FUCKING DEAD DICKHEAD");
+        Invoke("LoadVictory",3);
+    }
+
+    private void LoadVictory()
+    {
+        SceneManager.LoadScene(1); //victory screen
     }
 
     public IEnumerator bossDamage()
@@ -105,6 +153,11 @@ public class BossHead : MonoBehaviour
             Destroy(other.gameObject);
         }
     }
-    
+
+    private void HeadLaserAttack()
+    {
+        
+    }
+
 
 }

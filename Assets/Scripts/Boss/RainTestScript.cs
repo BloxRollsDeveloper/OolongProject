@@ -5,6 +5,8 @@ public class RainTestScript : MonoBehaviour
 {
     public GameObject rain1,rain2,rain3,rain4,rain5,rain6,rain7,rain8,rain9,rain10;
     public GameObject[] rain;
+    
+    public AudioClip rumbleClip;
 
     // Update is called once per frame
     void Update()
@@ -61,12 +63,14 @@ public class RainTestScript : MonoBehaviour
 
     }
 
-    public void SpawnRain()
+    public void SpawnRain(AudioClip clip)
     {
+        SoundFXManager.instance.PlaySoundFXClip(clip, transform, 1f);
         int randomIndex = Random.Range(0, rain.Length);
         GameObject randomPrefab = rain[randomIndex];
-            
+        
         var rainClone = Instantiate(randomPrefab, transform.position, transform.rotation);
         Destroy(rainClone,10);
+        
     }
 }

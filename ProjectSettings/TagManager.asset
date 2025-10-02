@@ -8,6 +8,7 @@ TagManager:
   - Bullet
   - Platform
   - BossHand
+  - Damage
   layers:
   - Default
   - TransparentFX

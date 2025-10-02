@@ -39,6 +39,20 @@ public class PlayerController : MonoBehaviour
 
     private Collider2D playerCollider;
     private Collider2D currentPlatform;
+    
+    [Header("audio")] 
+    [SerializeField] AudioClip[] StepClip;
+    [SerializeField] AudioClip[] jumpClip;
+    [SerializeField] AudioClip[] shootClip;
+    [SerializeField] AudioClip[] hitClip;
+    public float stepTimer;
+    public float stepCounter;
+
+    public float iframes;
+    private float _iframesTimer;
+    public int playerHealth;
+    public MenuCode menuCode;
+    public bool dead;
 
     private void Awake()
     {
@@ -51,6 +65,34 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
+        if (dead)
+        {
+            if (input.Jump)
+            {
+                menuCode.RestartGame();
+            }
+
+            if (Keyboard.current.sKey.wasPressedThisFrame)
+            {
+                /*
+                Web build
+                menuCode.skipUI = false;
+                menuCode.RestartGame();
+                */
+                Application.Quit(); //EXE build
+            }
+        }
+        if (dead) return;
+        if (_iframesTimer > 0)
+        {
+            sprite.color = new  Color(sprite.color.r, sprite.color.g, sprite.color.b, 0.5f);
+            _iframesTimer -= Time.deltaTime;
+        }
+        else
+        {
+            sprite.color = new  Color(sprite.color.r, sprite.color.g, sprite.color.b, 1f);
+        }
+        if (stepTimer > 0) stepTimer -= Time.deltaTime;
         if (cooldownTimer > 0f) cooldownTimer -= Time.deltaTime;
 
         playerIsGrounded = Physics2D.OverlapBox(
@@ -59,7 +101,7 @@ public class PlayerController : MonoBehaviour
         HandleMovement();
         HandleJump();
         HandleShoot();
-        HandleDropDown(); //
+        HandleDropDown(); 
         UpdateAnimator();
     }
 
@@ -68,6 +110,15 @@ public class PlayerController : MonoBehaviour
         float horizontal = input.Horizontal;
         rb.linearVelocity = new Vector2(horizontal * moveSpeed, rb.linearVelocity.y);
         if (horizontal != 0) sprite.flipX = horizontal < 0;
+        
+        if (input.Horizontal != 0 && playerIsGrounded)
+        {
+            if (stepTimer <= 0)
+            {
+                stepTimer = stepCounter;
+                SoundFXManager.instance.PlayRandomSoundFXClip(StepClip, transform, 0.5f);
+            }
+        }
     }
 
     private void HandleJump()
@@ -76,6 +127,7 @@ public class PlayerController : MonoBehaviour
         {
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
             animator.SetTrigger("jump");
+            SoundFXManager.instance.PlayRandomSoundFXClip(jumpClip, transform, 0.5f);
         }
 
         if (rb.linearVelocity.y < gravCutoff) rb.gravityScale = gravStrength;
@@ -91,6 +143,7 @@ public class PlayerController : MonoBehaviour
         {
             cooldownTimer = shootCooldown;
             Instantiate(bullet, bulletSpawn.position, Quaternion.identity);
+            SoundFXManager.instance.PlayRandomSoundFXClip(shootClip, transform, 0.1f);
         }
     }
 
@@ -130,6 +183,34 @@ public class PlayerController : MonoBehaviour
         {
             currentPlatform = collision.collider;
         }
+        
+    }
+
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.CompareTag("Damage") && _iframesTimer <= 0f)   
+        {
+            Damage();
+        }
+    }
+
+    private void Damage()
+    {
+        playerHealth--;
+        if (playerHealth > 0)
+        {
+            _iframesTimer = iframes;
+            print("hit");
+            SoundFXManager.instance.PlayRandomSoundFXClip(hitClip, transform, 0.5f);
+        }
+        else
+        {
+            menuCode.GameOver();
+            dead = true;
+        }
+
+        
+
     }
 
     private void OnCollisionExit2D(Collision2D collision)

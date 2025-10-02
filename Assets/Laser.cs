@@ -8,18 +8,16 @@ public class Laser : MonoBehaviour
     public Transform laserFirePoint;
     public LineRenderer lineRenderer;
     public EdgeCollider2D edgeCollider;
+    [SerializeField] private AudioClip laserSFXclip;
     
 
     private void Start()
     {
+        SoundFXManager.instance.PlaySoundFXClip(laserSFXclip, transform,0.5f);
         edgeCollider = GetComponent<EdgeCollider2D>();
         lineRenderer = gameObject.GetComponent<LineRenderer>();
     }
-
-    public IEnumerator LaserFire()
-    {
-        yield return new WaitForSeconds(1);
-    }
+    
     
     private void Update()
     {

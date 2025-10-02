@@ -42,6 +42,12 @@ public class HandScript : MonoBehaviour
     private float telegraphTimer;
 
     public int attackChainLocal;
+    
+    [Header("SFX")]
+    [SerializeField] AudioClip[] slamSFXclip;
+    [SerializeField] AudioClip[] sweepSFXclip;
+    [SerializeField] AudioClip rumbleClip;
+    [SerializeField] AudioClip[] grabCrunchClip;
 
     
     //sine wave math
@@ -61,16 +67,16 @@ public class HandScript : MonoBehaviour
     public bool attackSlamRandom;
     public bool attackSlamPlayer;
     public bool attackSweep;
-    //public bool PlatformDestruction 
+    //todo: public bool PlatformDestruction 
 
     public bool projectileRain;
     public bool projectilePitch;
     public bool projectileBasketball;
-    //public bool projectileBomb;
+    //todo: public bool projectileBomb;
 
-    //public bool laserHorizontal;
+    //todo: public bool laserHorizontal;
     public bool laserHorizontalRandom;
-    //public bool laserVertical;
+    //todo: public bool laserVertical;
     public bool laserVerticalRandom;
     
     private void Start()
@@ -151,14 +157,11 @@ public class HandScript : MonoBehaviour
         if (attack == 4) projectileRain = true;
         if (attack == 5)  projectilePitch = true;
         if (attack == 6) projectileBasketball = true;
-        if (attack == 7) laserHorizontalRandom = true;
-        if (attack == 8) laserVerticalRandom = true;
-    }
+        if (attack == 7) laserVerticalRandom = true;
+        if (attack == 8) laserHorizontalRandom = true;
 
-    public async void test()
-    {
-        await Task.Delay(TimeSpan.FromSeconds(3));
     }
+    
 
     private void UpdateAnimation()
     {
@@ -177,6 +180,7 @@ public class HandScript : MonoBehaviour
         if (invert) transform.localScale = new Vector2(1, 1);
         else transform.localScale = new Vector2(-1, 1);
         
+        damageCollider.enabled = false;
         handCollider.enabled = false;
         TargetPos = _startPos;
         _animator.Play("Boss fist");
@@ -187,7 +191,6 @@ public class HandScript : MonoBehaviour
         attacking = false;
         transitionMove = false;
     }
-
     public void AttackHandSlamRand()
     {
         attackSlamRandom = false;
@@ -205,10 +208,11 @@ public class HandScript : MonoBehaviour
         TargetPos += new Vector2(0,1);  //wind up position
         Invoke("AttackHandSlamRand2", bossHead.telegraphTime/2);
     }
-    private void AttackHandSlamRand2()
+    private void AttackHandSlamRand2() //slam position + sfx
     {
-        TargetPos = new Vector2(transform.position.x, -3.5f); //slam position
+        TargetPos = new Vector2(transform.position.x, -3.5f); 
         easeIn = true;
+        SoundFXManager.instance.PlayRandomSoundFXClip(slamSFXclip, transform, 1f);
         Invoke("AttackHandSlamRand3", bossHead.telegraphTime);
     }
     private void AttackHandSlamRand3()
@@ -240,10 +244,12 @@ public class HandScript : MonoBehaviour
         TargetPos += new Vector2(0,1);  //wind up position
         Invoke("attackHandSlamPlayer2", bossHead.telegraphTime/2);
     }
-    private void attackHandSlamPlayer2()
+    private void attackHandSlamPlayer2() //slam position + sfx
     {
-        TargetPos = new Vector2(transform.position.x, -3.5f); //slam position
+        TargetPos = new Vector2(transform.position.x, -3.5f); 
         easeIn = true;
+
+        SoundFXManager.instance.PlayRandomSoundFXClip(slamSFXclip, transform, 1f);
         Invoke("attackHandSlamPlayer3", bossHead.telegraphTime*2);
     }
     private void attackHandSlamPlayer3()
@@ -261,7 +267,6 @@ public class HandScript : MonoBehaviour
         }
     }
     
-    
 
     public void AttackHandSweep()
     {
@@ -275,6 +280,7 @@ public class HandScript : MonoBehaviour
     {
         _animator.Play("Boss fist");
         TargetPos += new Vector2(1,0);  //wind up position
+        SoundFXManager.instance.PlayRandomSoundFXClip(sweepSFXclip, transform, 1f);
         Invoke("AttackHandSweep2", bossHead.telegraphTime/2);
     }
 
@@ -293,59 +299,60 @@ public class HandScript : MonoBehaviour
         StartCoroutine(ResetPosition());
     }
 
-    public void AttackProjectileRain()
+    public void AttackProjectileRain() //go to trash pickup point
     {
         projectileRain = false;
         if (attacking)  return;
         attacking = true; transitionMove = true;
         
         _animator.Play("boss palm vertical");
-        TargetPos = _TrashPickup;   //go to trash pickup point
+        TargetPos = _TrashPickup;   
         //transform.rotation = Quaternion.Euler(0,0,90);
         Invoke("AttackProjectileRain1", bossHead.telegraphTime);
     }
-    private void AttackProjectileRain1()
+    private void AttackProjectileRain1() //grab trash
     {
         
         _animator.Play("boss grab");
+        SoundFXManager.instance.PlayRandomSoundFXClip(grabCrunchClip, transform, 0.5f);
         transform.localScale = transform.localScale * new Vector2(-1, 1);
         trashBall.SetActive(enabled);
         Invoke("AttackProjectileRain2", bossHead.telegraphTime/2);
     }
-    private void AttackProjectileRain2()
+    private void AttackProjectileRain2() //go to start point and reset position
     {
         
-        TargetPos = _startPos; //go to start point and reset position
+        TargetPos = _startPos; 
         //transform.rotation = Quaternion.Euler(0,0,0);
         Invoke("AttackProjectileRain3", bossHead.telegraphTime/2);
     }
-    private void AttackProjectileRain3()
+    private void AttackProjectileRain3() //wind up position
     {
-        TargetPos += new Vector2(0, -0.5f); //wind up position
+        TargetPos += new Vector2(0, -0.5f); 
         transform.rotation = Quaternion.Euler(0,0,180);
         Invoke("AttackProjectileRain4", bossHead.telegraphTime/2);
     }
-    private void AttackProjectileRain4()
+    private void AttackProjectileRain4() //throwing position
     {
-        TargetPos += new Vector2(0,5); //throwing position
+        TargetPos += new Vector2(0,5); 
         easeIn = true;
         Invoke("AttackProjectileRain5", bossHead.telegraphTime/4);
     }
-    private void AttackProjectileRain5()
+    private void AttackProjectileRain5() //release trash
     {
         trashBall.SetActive(false);
         _animator.Play("boss palm vertical");
         Invoke("AttackProjectileRain6", bossHead.telegraphTime/4);
     }
-    private void AttackProjectileRain6()
+    private void AttackProjectileRain6() //spawn trash rain
     {
         easeIn = false;
-        rainManager.SpawnRain();
+        rainManager.SpawnRain(rumbleClip);
         
         
         Invoke("AttackProjectileRain7", bossHead.telegraphTime/2);
     }
-    private void AttackProjectileRain7()
+    private void AttackProjectileRain7() //reset position
     {
         transform.localScale = transform.localScale * new Vector2(-1, 1);
         transform.rotation = Quaternion.Euler(0,0,0);
@@ -364,6 +371,7 @@ public class HandScript : MonoBehaviour
         yield return new WaitForSeconds(bossHead.telegraphTime);
         
         _animator.Play("boss grab");
+        SoundFXManager.instance.PlayRandomSoundFXClip(grabCrunchClip, transform, 0.5f);
         
         var projectileClone = Instantiate(carProjectile, transform.position, transform.rotation);
         projectileClone.TryGetComponent(out BigProjectileAttack projectileScript);
@@ -486,6 +494,7 @@ public class HandScript : MonoBehaviour
         yield return new WaitForSeconds(bossHead.telegraphTime);
         
         _animator.Play("boss grab");
+        SoundFXManager.instance.PlayRandomSoundFXClip(grabCrunchClip, transform, 0.5f);
         
         var projectileClone = Instantiate(carProjectile, transform.position, transform.rotation);
         projectileClone.TryGetComponent(out BigProjectileAttack projectileScript);
@@ -570,15 +579,16 @@ public class HandScript : MonoBehaviour
         attacking = true; transitionMove = true;
         
         TargetPos = new Vector2(Random.Range(-6.5f,6.5f),4); //go to random vertical position
+        easeIn = true;
         _animator.Play("boss palm vertical");
         transform.localScale *= new Vector2(-1, 1);
         
         yield return new WaitForSeconds(bossHead.telegraphTime/2);
         var projectileClone = Instantiate(laserObject, transform.position, transform.rotation);
         projectileClone.TryGetComponent(out Laser laserScript);
-        laserScript.laserFirePoint.transform.position = new Vector3(transform.position.x,-4,0); //set laser target position
+        laserScript.laserFirePoint.transform.position = new Vector3(transform.position.x,-4.5f,0); //set laser target position
         
-        easeIn = true;
+        
         //TargetPos += new Vector2(0, 0.5f); //wind up position
         yield return new WaitForSeconds(bossHead.telegraphTime);
         easeIn = false;

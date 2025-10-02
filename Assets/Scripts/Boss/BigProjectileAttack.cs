@@ -10,6 +10,7 @@ public class BigProjectileAttack : MonoBehaviour
     public bool invert;
     public float moveSpeed;
     public bool basketball;
+    [SerializeField] private AudioClip[] ImpactClip;
     
     void Start()
     {
@@ -35,6 +36,7 @@ public class BigProjectileAttack : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
+        SoundFXManager.instance.PlayRandomSoundFXClip(ImpactClip, transform,0.25f);
         transform.rotation = Quaternion.Euler(0,0,transform.rotation.eulerAngles.z+90);
     }
 }
