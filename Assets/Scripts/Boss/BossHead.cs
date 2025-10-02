@@ -30,6 +30,7 @@ public class BossHead : MonoBehaviour
 
     private void Update()
     {
+        if (bossHealth <= 0)
             _sinTimer += Time.deltaTime; //sine wave timer
             Vector2 position = transform.position;  //local variable: position
             float sin = Mathf.Sin(_sinTimer*frequency) * amplitude; //sine wave math

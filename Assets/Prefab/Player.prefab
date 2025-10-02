@@ -79,7 +79,7 @@ GameObject:
   - component: {fileID: 4519045738769564222}
   m_Layer: 0
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -185,18 +185,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 5
-  jumpForce: 10
+  jumpForce: 7
+  gravCutoff: -0.1
+  gravStrength: 10
+  terminalVelocity: -10
+  groundCheck: {fileID: 5042992260647479360}
   groundBoxSize: {x: 0.8, y: 0.2}
   whatIsGround:
     serializedVersion: 2
     m_Bits: 8
-  groundCheck: {fileID: 5042992260647479360}
-  playerIsGrounded: 1
   bullet: {fileID: 3011195478498164569, guid: d243455085657bf4c936706afb318f39, type: 3}
   bulletSpawn: {fileID: 2728769546818696262}
-  gravCuttoff: 7
-  gravStrength: 10
-  terminalVelocity: -10
+  shootCooldown: 0.25
+  dropTime: 0.3
 --- !u!50 &-3231906521020303126
 Rigidbody2D:
   serializedVersion: 5
@@ -234,7 +235,7 @@ Animator:
   m_GameObject: {fileID: 4566519416414091231}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: d0c25812e3735bc488ab80206a7d87bd, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
