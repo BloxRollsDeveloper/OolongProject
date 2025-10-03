@@ -53,7 +53,7 @@ public class SoundFXManager : MonoBehaviour
 
     public void PlayMusic()
     {
-        Music.volume = 0.3f;
+        Music.volume = 0.4f;
         Music.clip = background;
         Music.Play();
     }

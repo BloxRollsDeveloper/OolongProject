@@ -185,7 +185,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 5
-  jumpForce: 7
+  jumpForce: 7.5
   gravCutoff: -0.1
   gravStrength: 10
   terminalVelocity: -10
@@ -198,6 +198,16 @@ MonoBehaviour:
   bulletSpawn: {fileID: 2728769546818696262}
   shootCooldown: 0.25
   dropTime: 0.3
+  StepClip: []
+  jumpClip: []
+  shootClip: []
+  hitClip: []
+  stepTimer: 0
+  stepCounter: 0
+  iframes: 0
+  playerHealth: 0
+  menuCode: {fileID: 0}
+  dead: 0
 --- !u!50 &-3231906521020303126
 Rigidbody2D:
   serializedVersion: 5

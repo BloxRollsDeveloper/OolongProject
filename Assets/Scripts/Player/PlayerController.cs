@@ -67,7 +67,7 @@ public class PlayerController : MonoBehaviour
     {
         if (dead)
         {
-            if (input.Jump)
+            if (input.Attack)
             {
                 menuCode.RestartGame();
             }
@@ -188,6 +188,7 @@ public class PlayerController : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
+        Debug.Log(other.name);
         if (other.CompareTag("Damage") && _iframesTimer <= 0f)   
         {
             Damage();

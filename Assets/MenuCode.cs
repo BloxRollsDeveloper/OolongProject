@@ -1,20 +1,29 @@
 using System;
 using Unity.VisualScripting;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class MenuCode : MonoBehaviour
 {
+    private InputManager2 _inputManager;
     public GameObject MenuUI;
     public GameObject RestartUI;
     public GameObject HeartUI;
     public bool skipUI = false;
     public GameObject Player;
     public bool gameOverInput;
+    public bool MenuInput;
+    public BossHead bossHead;
+    public GameObject hardModeText;
+
     
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Awake()
     {
+        hardModeText.active = false;
+        _inputManager = GetComponent<InputManager2>();
+        MenuInput = true;
         print("awake");
         MenuUI.gameObject.SetActive(true);
         gameOverInput = false;
@@ -39,12 +48,29 @@ public class MenuCode : MonoBehaviour
         }
     }
 
+    private void Update()
+    {
+        if (MenuInput && _inputManager.Jump) 
+        {
+            StartGame();
+        }
+
+        if (MenuInput && _inputManager.Attack)
+        {
+            bossHead.HardMode = !bossHead.HardMode;
+            hardModeText.SetActive(bossHead.HardMode);
+            print(bossHead.HardMode);
+        }
+    }
+
     public void StartGame()
     {
         skipUI = true;
         Time.timeScale = 1;
         MenuUI.gameObject.SetActive(false);
         HeartUI.SetActive(true);
+        MenuInput = false;
+        hardModeText.SetActive(false);
     }
 
     public void ExitGame()

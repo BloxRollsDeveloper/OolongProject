@@ -35,6 +35,7 @@ public class Laser : MonoBehaviour
     public void stopLaser()
     {
         lineRenderer.enabled = false;
+        edgeCollider.enabled = false;
         Destroy(gameObject,0.5f);
     }
 

@@ -42,7 +42,7 @@ public class BossHead : MonoBehaviour
     public float frequency;
     public float amplitude;
     private Vector2 _startPos;
-
+    public bool HardMode;
 
     private void Start()
     {

@@ -12,6 +12,7 @@ public class HandScript : MonoBehaviour
     [Header("projectiles")]
     public GameObject trashBall;
 
+   
     public GameObject carProjectile;
     public RainTestScript rainManager;
     public GameObject bomb;
@@ -38,6 +39,7 @@ public class HandScript : MonoBehaviour
     public bool attacking;
     public bool followPlayer;
     public bool invert;
+   
 
     private float telegraphTimer;
 
@@ -89,14 +91,19 @@ public class HandScript : MonoBehaviour
         handRb = GetComponent<Rigidbody2D>();
         _stageEdge = stageEdgeTransform.position;
         _TrashPickup = TrashPickupTransform.position;
-        damageCollider = gameObject.GetComponentInChildren<Collider2D>();
         _animator = GetComponent<Animator>();
+        
     }
     
     
 
     private void Update()
     {
+        if (bossHead.HardMode)
+        {
+            damageCollider = GetComponent<Collider2D>(); //disable collider issues
+        }
+
 
         if (!bossHead.bossActive) return;
         if (transitionMove) //used for attacking animations to smooth transition between 2 points
@@ -210,6 +217,7 @@ public class HandScript : MonoBehaviour
     }
     private void AttackHandSlamRand2() //slam position + sfx
     {
+        damageCollider.enabled = true;
         TargetPos = new Vector2(transform.position.x, -3.5f); 
         easeIn = true;
         SoundFXManager.instance.PlayRandomSoundFXClip(slamSFXclip, transform, 1f);
@@ -240,6 +248,7 @@ public class HandScript : MonoBehaviour
     }
     private void attackHandSlamPlayer1()
     {
+        damageCollider.enabled = true;
         followPlayer = false;
         TargetPos += new Vector2(0,1);  //wind up position
         Invoke("attackHandSlamPlayer2", bossHead.telegraphTime/2);
@@ -276,10 +285,11 @@ public class HandScript : MonoBehaviour
         TargetPos = _stageEdge; //move to the stage edge
         Invoke("AttackHandSweep1", bossHead.telegraphTime);
     }
-    private void AttackHandSweep1()
+    private void AttackHandSweep1() //wind up position
     {
+        damageCollider.enabled = true;
         _animator.Play("Boss fist");
-        TargetPos += new Vector2(1,0);  //wind up position
+        TargetPos += new Vector2(1,0);  
         SoundFXManager.instance.PlayRandomSoundFXClip(sweepSFXclip, transform, 1f);
         Invoke("AttackHandSweep2", bossHead.telegraphTime/2);
     }
@@ -583,7 +593,7 @@ public class HandScript : MonoBehaviour
         _animator.Play("boss palm vertical");
         transform.localScale *= new Vector2(-1, 1);
         
-        yield return new WaitForSeconds(bossHead.telegraphTime/2);
+        yield return new WaitForSeconds(bossHead.telegraphTime);
         var projectileClone = Instantiate(laserObject, transform.position, transform.rotation);
         projectileClone.TryGetComponent(out Laser laserScript);
         laserScript.laserFirePoint.transform.position = new Vector3(transform.position.x,-4.5f,0); //set laser target position
