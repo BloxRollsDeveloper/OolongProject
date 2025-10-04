@@ -34,6 +34,8 @@ public class PlayerController : MonoBehaviour
     private Animator animator;
     private SpriteRenderer sprite;
     private InputManager2 input;
+    public Material DefaultMaterial;
+    public Material FlashMaterial;
     private bool playerIsGrounded;
     private float cooldownTimer;
 
@@ -53,6 +55,7 @@ public class PlayerController : MonoBehaviour
     public int playerHealth;
     public MenuCode menuCode;
     public bool dead;
+    public Shake cameraShake;
 
     private void Awake()
     {
@@ -67,12 +70,9 @@ public class PlayerController : MonoBehaviour
     {
         if (dead)
         {
-            if (input.Attack)
-            {
-                menuCode.RestartGame();
-            }
+            animator.Play("Death");
 
-            if (Keyboard.current.sKey.wasPressedThisFrame)
+            if (input.Drop)
             {
                 /*
                 Web build
@@ -126,7 +126,7 @@ public class PlayerController : MonoBehaviour
         if (input.Jump && playerIsGrounded)
         {
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
-            animator.SetTrigger("jump");
+            animator.SetTrigger("Jump");
             SoundFXManager.instance.PlayRandomSoundFXClip(jumpClip, transform, 0.5f);
         }
 
@@ -149,7 +149,7 @@ public class PlayerController : MonoBehaviour
 
     private void HandleDropDown()
     {
-        if (Keyboard.current.sKey.wasPressedThisFrame)
+        if (input.Drop)
         {
             Collider2D platform = Physics2D.OverlapBox(
                 groundCheck.position, groundBoxSize, 0f, whatIsGround);
@@ -200,9 +200,12 @@ public class PlayerController : MonoBehaviour
         playerHealth--;
         if (playerHealth > 0)
         {
+            cameraShake.PlayerHitShake();
+            sprite.material = FlashMaterial;
             _iframesTimer = iframes;
             print("hit");
             SoundFXManager.instance.PlayRandomSoundFXClip(hitClip, transform, 0.5f);
+            Invoke("DamageFlash", 0.2f);
         }
         else
         {
@@ -214,6 +217,11 @@ public class PlayerController : MonoBehaviour
 
     }
 
+    private void DamageFlash()
+    {
+        sprite.material = DefaultMaterial;
+    }
+    
     private void OnCollisionExit2D(Collision2D collision)
     {
         if (collision.collider == currentPlatform)

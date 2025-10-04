@@ -15,9 +15,11 @@ public class HandScript : MonoBehaviour
    
     public GameObject carProjectile;
     public RainTestScript rainManager;
+    public AttackIndicator flashIndicator;
     public GameObject bomb;
     public GameObject laserObject;
     private Animator _animator;
+    private LineRenderer _lineRenderer;
     
     [Header("movement")]
     public Transform stageEdgeTransform;
@@ -42,6 +44,8 @@ public class HandScript : MonoBehaviour
    
 
     private float telegraphTimer;
+    public float flashDuration;
+    public AnimationCurve FlashCurve;
 
     public int attackChainLocal;
     
@@ -92,7 +96,7 @@ public class HandScript : MonoBehaviour
         _stageEdge = stageEdgeTransform.position;
         _TrashPickup = TrashPickupTransform.position;
         _animator = GetComponent<Animator>();
-        
+        _lineRenderer = GetComponent<LineRenderer>();
     }
     
     
@@ -229,6 +233,7 @@ public class HandScript : MonoBehaviour
 
         if (attackChainLocal > 0) //chain attacks multiple times if local chain is greater than 0
         {
+            damageCollider.enabled = false;
             attacking = false;
             AttackHandSlamRand();
         }else StartCoroutine(ResetPosition());
@@ -283,10 +288,12 @@ public class HandScript : MonoBehaviour
         if (attacking)  return;
         transitionMove = true; attacking = true; handCollider.enabled = true;
         TargetPos = _stageEdge; //move to the stage edge
+        flashIndicator.flash = true;
         Invoke("AttackHandSweep1", bossHead.telegraphTime);
     }
     private void AttackHandSweep1() //wind up position
     {
+        
         damageCollider.enabled = true;
         _animator.Play("Boss fist");
         TargetPos += new Vector2(1,0);  
@@ -578,6 +585,28 @@ public class HandScript : MonoBehaviour
             StartCoroutine(ResetPosition());
         }
     }
+
+    private IEnumerator LaserFlash() //laser indicator
+    {
+        _lineRenderer.SetPosition(0, transform.position);
+        _lineRenderer.SetPosition(1, new Vector3(transform.position.x,-4.5f,0));
+        
+
+        float elapsedTime = 0f;
+
+        while (elapsedTime < flashDuration)
+        {
+            elapsedTime += Time.deltaTime;
+            float strength = FlashCurve.Evaluate(elapsedTime / flashDuration);
+            _lineRenderer.startColor = new Color(
+                _lineRenderer.startColor.r, 
+                _lineRenderer.startColor.g, 
+                _lineRenderer.startColor.b, 
+                strength);
+            _lineRenderer.endColor = _lineRenderer.startColor;
+            yield return null;
+        }
+    }
     
     public IEnumerator AttackLaserVerticalRandom()
     {
@@ -588,12 +617,14 @@ public class HandScript : MonoBehaviour
         if (attackChainLocal > 0) attackChainLocal--;
         attacking = true; transitionMove = true;
         
-        TargetPos = new Vector2(Random.Range(-6.5f,6.5f),4); //go to random vertical position
+        TargetPos = new Vector2(Random.Range(-6.5f,6.5f),2); //go to random vertical position
         easeIn = true;
         _animator.Play("boss palm vertical");
         transform.localScale *= new Vector2(-1, 1);
         
-        yield return new WaitForSeconds(bossHead.telegraphTime);
+        yield return new WaitForSeconds(bossHead.telegraphTime/2);
+        StartCoroutine(LaserFlash());
+        yield return new WaitForSeconds(bossHead.telegraphTime/2);
         var projectileClone = Instantiate(laserObject, transform.position, transform.rotation);
         projectileClone.TryGetComponent(out Laser laserScript);
         laserScript.laserFirePoint.transform.position = new Vector3(transform.position.x,-4.5f,0); //set laser target position

@@ -9,7 +9,9 @@ using UnityEngine.Serialization;
 public class BossHead : MonoBehaviour
 {
 
+    [Header("scripts")]
     public BossSoundManager bossSoundManager;
+    public Shake cameraShake;
     private SpriteRenderer _spriteRenderer;
     public  Rigidbody2D headRB;
     public Rigidbody2D PlayerRB;
@@ -20,8 +22,10 @@ public class BossHead : MonoBehaviour
     public Sprite headInactive;
     public AudioClip bossRoar;
     public AudioClip bossRoar2;
+    public MenuCode menuCode;
     
     public int bossHealth;
+    public int bossHealthMax;
     public float telegraphTime;
     public float projectileSpeed;
     public float projectileDamage; //maybe maybe not
@@ -54,38 +58,61 @@ public class BossHead : MonoBehaviour
         headRB = GetComponent<Rigidbody2D>();
         PlayerRB = GameObject.FindGameObjectWithTag("Player").GetComponent<Rigidbody2D>();
         startingAnimation();
+        bossHealthMax = bossHealth;
     }
 
-    public void startingAnimation()
+    public void startingAnimation() //inactive head idle
     {
         _spriteRenderer.sprite = headInactive;
         BossJaw.gameObject.transform.position = _startPos;
         Invoke("StartingAnim1", 4);
     }
 
-    private void StartingAnim1()
+    private void StartingAnim1() //eyes active
     {
         _spriteRenderer.sprite = headActive;
         Invoke ("startingAnim2",2f);
     }
 
-    private void startingAnim2()
+    private void startingAnim2() //roar
     {
-        BossJaw.gameObject.transform.position = new Vector2(_startPos.x, _startPos.y-1.5f);
-        transform.position = new Vector2(transform.position.x, transform.position.y+0.5f);
-        SoundFXManager.instance.PlaySoundFXClip(bossRoar,transform,1f);
+        Roar();
         Invoke("StartBoss",3f);
+        Invoke("StartMusic",3f);
     }
-    
+
+    private void Roar()
+    {
+        cameraShake.BossShake();
+        BossJaw.gameObject.transform.position = new Vector2(_startPos.x, _startPos.y-1.5f);
+        transform.position = Vector2.Lerp(transform.position, new Vector2(transform.position.x, transform.position.y+0.5f), 0.5f);
+        SoundFXManager.instance.PlaySoundFXClip(bossRoar,transform,1f);
+    }
+
+    private void StartMusic()
+    {
+        SoundFXManager.instance.PlayMusic();
+    }
     private void StartBoss()
     {
+        if (bossHealth == bossHealthMax)
+        {
+            menuCode.tutorialVisible = true;
+            menuCode.ShowTutorial();
+        }
+        
         bossActive = true;
-        SoundFXManager.instance.PlayMusic();
     }
     
     private void Update()
     {
-        if (bossHealth == 150) bossStage = 2;
+        if (bossHealth == bossHealthMax/2 && bossStage == 1) //stage 2 code
+        {
+            bossActive = false;
+            Roar();
+            bossStage = 2;
+            Invoke("StartBoss",2f);
+        }
         if (!bossActive) return;
         if (bossHealth <= 0)
         {
@@ -109,7 +136,7 @@ public class BossHead : MonoBehaviour
             else
             {
                 AttackPool = 5;
-                _attackTimer = attackCooldown;
+                _attackTimer = attackCooldown/bossStage;
             }
         }
 
