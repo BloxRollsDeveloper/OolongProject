@@ -58,6 +58,7 @@ public class BossHead : MonoBehaviour
         headRB = GetComponent<Rigidbody2D>();
         PlayerRB = GameObject.FindGameObjectWithTag("Player").GetComponent<Rigidbody2D>();
         startingAnimation();
+        
         bossHealthMax = bossHealth;
     }
 
@@ -69,7 +70,12 @@ public class BossHead : MonoBehaviour
     }
 
     private void StartingAnim1() //eyes active
-    {
+        {
+            if (HardMode)
+            {
+                bossHealth = 400;
+                bossHealthMax = 400;
+            }
         _spriteRenderer.sprite = headActive;
         Invoke ("startingAnim2",2f);
     }
@@ -97,6 +103,7 @@ public class BossHead : MonoBehaviour
     {
         if (bossHealth == bossHealthMax)
         {
+            
             menuCode.tutorialVisible = true;
             menuCode.ShowTutorial();
         }
