@@ -19,11 +19,7 @@ public class MenuCode : MonoBehaviour
     public BossHead bossHead;
     public GameObject hardModeText;
     
-    [Header("WEB BUILD CONTENT")]
-    public bool webBuild;
-    public GameObject quitButton;
-    public GameObject QuitPrompt;
-
+    [Header("tutorial stuff")]
     public GameObject tutorial;
     public TextMeshProUGUI tutorialSprite;
     public SpriteRenderer spacebarSprite;
@@ -32,6 +28,11 @@ public class MenuCode : MonoBehaviour
     public AnimationCurve easeInCurve;
     public AnimationCurve easeOutCurve;
     public bool tutorialVisible;
+    
+    [Header("WEB BUILD CONTENT")]
+    public bool webBuild;
+    public GameObject quitButton;
+    public GameObject QuitPrompt;
 
     IEnumerator fadeInTutorial()
     {
@@ -148,6 +149,11 @@ public class MenuCode : MonoBehaviour
         HeartUI.SetActive(true);
         MenuInput = false;
         hardModeText.SetActive(false);
+        if (bossHead.HardMode)
+        {
+            bossHead.bossHealthMax = 500;
+            bossHead.bossHealth = 500;
+        }
     }
 
     public void ExitGame()
