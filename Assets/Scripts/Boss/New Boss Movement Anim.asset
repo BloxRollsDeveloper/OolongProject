@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6e43ea365cfd0b448a1d3969cd648b4f, type: 3}
+  m_Name: New Boss Movement Anim
+  m_EditorClassIdentifier: 
+  MovementPoints:
+  - {x: 8, y: -3.5}
+  - {x: -8, y: 0}
+  WindUpToggle: 0001
+  TelegraphTime:
+  - 0
+  - 0
+  MovementEaseInToggle: 0000

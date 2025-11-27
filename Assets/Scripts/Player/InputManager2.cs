@@ -12,6 +12,7 @@ public class InputManager2: MonoBehaviour
     private void Update()
     {
         Horizontal = _inputSystem.Player.Move.ReadValue<Vector2>().x;
+        
         Jump = _inputSystem.Player.Jump.WasPressedThisFrame();
         Attack = _inputSystem.Player.Interact.WasPressedThisFrame();
         AttackHeld = _inputSystem.Player.Interact.IsPressed();

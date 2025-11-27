@@ -9,9 +9,10 @@ using UnityEngine.Serialization;
 public class BossHead : MonoBehaviour
 {
 
-    [Header("scripts")]
+    [Header("Dependencies")]
     public BossSoundManager bossSoundManager;
     public Shake cameraShake;
+    public MenuCode menuCode;
     private SpriteRenderer _spriteRenderer;
     public  Rigidbody2D headRB;
     public Rigidbody2D PlayerRB;
@@ -20,33 +21,39 @@ public class BossHead : MonoBehaviour
     public GameObject[] handObject;
     public Sprite headActive;
     public Sprite headInactive;
+
+    [Header("SFX")]
     public AudioClip bossRoar;
     public AudioClip bossRoar2;
-    public MenuCode menuCode;
     
+    
+    [Header("boss properties")]
+    public bool HardMode;
     public int bossHealth;
     public int bossHealthMax;
-    public float telegraphTime;
-    public float projectileSpeed;
-    public float projectileDamage; //maybe maybe not
+    public bool attacking;
+    public bool bossActive;
 
     public float attackCooldown;
     private float _attackTimer;
+    public int AttackPoolMax;
     public int AttackPool;
     public float HeadCooldown;
     private float _headTimer;
 
-    private bool _attacking;
-    public bool bossActive;
+    public bool startAnim;
     public float bossStage;
 
+    [Header("Hand Properties")]
+    public float telegraphTime;
+    public float projectileSpeed;
+    public float projectileDamage; //maybe maybe not
     
-    //sine wave stuff
+    [Header("Sine Wave Stuff")]
     private float _sinTimer;
     public float frequency;
     public float amplitude;
     private Vector2 _startPos;
-    public bool HardMode;
 
     private void Start()
     {
@@ -57,7 +64,12 @@ public class BossHead : MonoBehaviour
         _startPos = transform.position;
         headRB = GetComponent<Rigidbody2D>();
         PlayerRB = GameObject.FindGameObjectWithTag("Player").GetComponent<Rigidbody2D>();
-        startingAnimation();
+        if (startAnim) startingAnimation();
+        else
+        {
+            bossActive = true;
+            SoundFXManager.instance.PlayMusic();
+        }
         
         bossHealthMax = bossHealth;
     }
@@ -103,11 +115,11 @@ public class BossHead : MonoBehaviour
     {
         if (bossHealth == bossHealthMax)
         {
-            
             menuCode.tutorialVisible = true;
             menuCode.ShowTutorial();
         }
-        
+
+        attacking = true;
         bossActive = true;
     }
     
@@ -115,7 +127,7 @@ public class BossHead : MonoBehaviour
     {
         if (bossHealth == bossHealthMax/2 && bossStage == 1) //stage 2 code
         {
-            bossActive = false;
+            attacking = false;
             Roar();
             bossStage = 2;
             Invoke("StartBoss",2f);
@@ -124,11 +136,12 @@ public class BossHead : MonoBehaviour
         if (bossHealth <= 0)
         {
             bossActive = false;
+            attacking = false;  
             Invoke("Death",2);
         }
         if (_attackTimer > 0) _attackTimer -= Time.deltaTime;
 
-        if (_attackTimer <= 0)
+        if (_attackTimer <= 0 && attacking)
         {
             if (AttackPool > 0)
             {  
@@ -142,7 +155,7 @@ public class BossHead : MonoBehaviour
             }
             else
             {
-                AttackPool = 5;
+                AttackPool = AttackPoolMax;
                 _attackTimer = attackCooldown/bossStage;
             }
         }

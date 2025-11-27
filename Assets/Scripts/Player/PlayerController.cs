@@ -8,6 +8,8 @@ using UnityEngine.InputSystem;
 [RequireComponent(typeof(InputManager2))]
 public class PlayerController : MonoBehaviour
 {
+    public bool godMode;
+    
     [Header("Movement Settings")]
     public float moveSpeed = 5f;
     public float jumpForce = 10f;
@@ -189,7 +191,7 @@ public class PlayerController : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D other)
     {
         Debug.Log(other.name);
-        if (other.CompareTag("Damage") && _iframesTimer <= 0f)   
+        if ((other.CompareTag("Damage") && _iframesTimer <= 0f)&& !godMode)   
         {
             Damage();
         }

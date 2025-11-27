@@ -10,6 +10,13 @@ public class Shake : MonoBehaviour
     public AnimationCurve strongCurve;
     public AnimationCurve smallCurve;
     public bool StrongShake;
+    private Vector3 startPosition;
+    public float shakeStrength;
+
+    private void Start()
+    {
+        startPosition = transform.position;
+    }
 
     private void Update()
     {
@@ -18,6 +25,9 @@ public class Shake : MonoBehaviour
             start = false;
             StartCoroutine(Shaking());
         }
+        
+        transform.position = startPosition + Random.insideUnitSphere * shakeStrength;
+        
     }
 
     public void BossShake()
